@@ -12,7 +12,7 @@ export async function fetchSlots(
   const { data, error } = await supabase.rpc("available_slots", {
     p_slug: slug,
     p_service: serviceId,
-    p_barber: barberId,
+    p_barber: barberId as unknown as string,
     p_date: dateKey,
   });
   if (error) throw error;

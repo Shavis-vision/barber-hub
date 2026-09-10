@@ -20,6 +20,7 @@ const icons: Record<string, typeof Check> = {
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   const Icon = icons[status] ?? Clock;
+  const style = styles[status] ?? styles["pending"];
   return (
     <span
       className={cn(

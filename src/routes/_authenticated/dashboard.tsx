@@ -111,10 +111,7 @@ function DashboardPage() {
         )}
       </section>
 
-      <section className="mt-6 grid gap-3 sm:grid-cols-3">
-        <Button variant="outline" className="h-12 justify-start" onClick={() => setCreating(true)}>
-          Criar agendamento
-        </Button>
+      <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link to="/barbeiros">
           <Button variant="outline" className="h-12 w-full justify-start">
             Cadastrar barbeiro

@@ -176,7 +176,7 @@ export function NewAppointmentDialog({
           <div className="space-y-1.5">
             <Label>Serviço</Label>
             <Select
-              value={serviceId ?? undefined}
+              value={serviceId ?? ""}
               onValueChange={(v) => {
                 setServiceId(v);
                 setSlot(null);

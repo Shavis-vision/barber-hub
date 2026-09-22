@@ -13,21 +13,27 @@ import {
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyShop } from "@/lib/shop";
+import { useAccessProfile, type Role } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/agenda", label: "Agenda", icon: CalendarRange },
-  { to: "/agendamentos", label: "Agendamentos", icon: CalendarDays },
-  { to: "/clientes", label: "Clientes", icon: Users },
-  { to: "/barbeiros", label: "Barbeiros", icon: UserRound },
-  { to: "/servicos", label: "Serviços", icon: Scissors },
-  { to: "/configuracoes", label: "Configurações", icon: Settings },
-] as const;
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner"] },
+  { to: "/agenda", label: "Agenda", icon: CalendarRange, roles: ["owner", "barber"] },
+  { to: "/agendamentos", label: "Agendamentos", icon: CalendarDays, roles: ["owner", "barber"] },
+  { to: "/clientes", label: "Clientes", icon: Users, roles: ["owner"] },
+  { to: "/barbeiros", label: "Barbeiros", icon: UserRound, roles: ["owner"] },
+  { to: "/servicos", label: "Serviços", icon: Scissors, roles: ["owner"] },
+  { to: "/configuracoes", label: "Configurações", icon: Settings, roles: ["owner"] },
+  { to: "/perfil", label: "Meu perfil", icon: UserRound, roles: ["barber"] },
+] as const satisfies ReadonlyArray<{
+  to: string;
+  label: string;
+  icon: typeof Users;
+  roles: readonly Role[];
+}>;
 
-const MOBILE_NAV = NAV.filter((item) =>
-  ["/dashboard", "/agenda", "/clientes", "/servicos", "/configuracoes"].includes(item.to),
-);
+const MOBILE_FOR_OWNER = ["/dashboard", "/agenda", "/clientes", "/servicos", "/configuracoes"];
+const MOBILE_FOR_BARBER = ["/agenda", "/agendamentos", "/perfil"];
 
 export function AppShell({
   title,
@@ -41,7 +47,13 @@ export function AppShell({
   children: ReactNode;
 }) {
   const { data: shop } = useMyShop();
+  const { data: profile } = useAccessProfile();
+  const role: Role = profile?.role ?? "client";
   const router = useRouter();
+
+  const nav = NAV.filter((item) => (item.roles as readonly Role[]).includes(role));
+  const mobilePaths = role === "barber" ? MOBILE_FOR_BARBER : MOBILE_FOR_OWNER;
+  const mobileNav = nav.filter((item) => mobilePaths.includes(item.to));
 
   async function signOut() {
     await supabase.auth.signOut();
@@ -56,10 +68,13 @@ export function AppShell({
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {shop?.name ?? "Carregando…"}
           </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            {role === "owner" ? "Dono" : role === "barber" ? "Barbeiro" : ""}
+          </p>
         </div>
 
         <nav className="flex flex-1 flex-col gap-0.5">
-          {NAV.map(({ to, label, icon: Icon }) => (
+          {nav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}
@@ -111,8 +126,11 @@ export function AppShell({
       </div>
 
       <nav className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 backdrop-blur-sm lg:hidden">
-        <div className="grid grid-cols-5">
-          {MOBILE_NAV.map(({ to, label, icon: Icon }) => (
+        <div
+          className="grid"
+          style={{ gridTemplateColumns: `repeat(${Math.max(mobileNav.length, 1)}, minmax(0, 1fr))` }}
+        >
+          {mobileNav.map(({ to, label, icon: Icon }) => (
             <Link
               key={to}
               to={to}

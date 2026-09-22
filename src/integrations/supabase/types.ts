@@ -137,6 +137,7 @@ export type Database = {
           name: string
           phone: string | null
           photo_url: string | null
+          user_id: string | null
         }
         Insert: {
           active?: boolean
@@ -146,6 +147,7 @@ export type Database = {
           name: string
           phone?: string | null
           photo_url?: string | null
+          user_id?: string | null
         }
         Update: {
           active?: boolean
@@ -155,6 +157,7 @@ export type Database = {
           name?: string
           phone?: string | null
           photo_url?: string | null
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -398,6 +401,38 @@ export type Database = {
           },
         ]
       }
+      user_roles: {
+        Row: {
+          barbershop_id: string | null
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          barbershop_id?: string | null
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          barbershop_id?: string | null
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_roles_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       working_hours: {
         Row: {
           barber_id: string | null
@@ -475,10 +510,19 @@ export type Database = {
         Args: { p_name: string; p_slug: string }
         Returns: string
       }
+      current_barber_id: { Args: never; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_shop_barber: { Args: { _shop: string }; Returns: boolean }
       owns_shop: { Args: { p_shop: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "owner" | "barber" | "client"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -605,6 +649,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["owner", "barber", "client"],
+    },
   },
 } as const

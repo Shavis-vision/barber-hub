@@ -206,6 +206,10 @@ function PublicBooking() {
         <Block title="Horário">
           {slots.isLoading ? (
             <p className="text-sm text-muted-foreground">Buscando horários…</p>
+          ) : slots.isError ? (
+            <p className="text-sm text-destructive">
+              Erro ao buscar horários: {(slots.error as Error).message}
+            </p>
           ) : grouped.length === 0 ? (
             <p className="text-sm text-muted-foreground">Não há horários disponíveis para esta data.</p>
           ) : (

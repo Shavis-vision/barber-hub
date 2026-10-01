@@ -93,37 +93,87 @@ function ClientPage() {
   );
 }
 
+/** Aceita link completo, "meu-slug" ou nome com acento/maiúscula e devolve um slug válido. */
+function toSlug(input: string) {
+  return input
+    .trim()
+    .replace(/^.*\/barbearia\//, "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+type ShopHit = { name: string; slug: string; address: string | null };
+
+function useShopSearch(term: string) {
+  const q = term.trim();
+  return useQuery({
+    queryKey: ["shop-search", q],
+    enabled: q.length >= 2,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("search_barbershops", { p_query: q });
+      if (error) throw error;
+      return (data ?? []) as ShopHit[];
+    },
+  });
+}
+
 function NewBooking({ lastShop }: { lastShop?: string | undefined }) {
-  const [slug, setSlug] = useState("");
-  const clean = slug.trim().replace(/^.*\/barbearia\//, "").replace(/\/$/, "");
+  const [term, setTerm] = useState("");
+  const direct = toSlug(term);
+  const isLink = term.includes("/barbearia/");
+  const search = useShopSearch(isLink ? direct : term);
+  const hits = search.data ?? [];
+  const typed = term.trim().length >= 2;
+
   return (
     <section className="mt-5 panel p-4">
       <p className="text-sm font-medium">Novo agendamento</p>
       {lastShop ? (
         <Link to="/barbearia/$slug" params={{ slug: lastShop }} className="mt-3 block">
           <Button className="h-11 w-full">
-            <CalendarPlus className="size-4" aria-hidden /> Novo agendamento
+            <CalendarPlus className="size-4" aria-hidden /> Agendar de novo na última barbearia
           </Button>
         </Link>
       ) : null}
       <p className="mt-3 text-xs text-muted-foreground">
-        {lastShop ? "Ou agende em outra barbearia:" : "Informe o endereço da barbearia (enviado por ela):"}
+        {lastShop ? "Ou procure outra barbearia:" : "Procure a barbearia pelo nome ou cole o link enviado por ela:"}
       </p>
-      <div className="mt-2 flex gap-2">
-        <Input
-          className="h-11"
-          placeholder="nome-da-barbearia"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-        />
-        {clean ? (
-          <Link to="/barbearia/$slug" params={{ slug: clean }}>
-            <Button variant="outline" className="h-11">Continuar</Button>
-          </Link>
-        ) : (
-          <Button variant="outline" className="h-11" disabled>Continuar</Button>
-        )}
-      </div>
+      <Input
+        className="mt-2 h-11"
+        placeholder="Nome da barbearia"
+        value={term}
+        onChange={(e) => setTerm(e.target.value)}
+      />
+
+      {typed && (
+        <div className="mt-2 grid gap-2">
+          {search.isLoading ? (
+            <p className="text-xs text-muted-foreground">Buscando…</p>
+          ) : hits.length > 0 ? (
+            hits.map((s) => (
+              <Link key={s.slug} to="/barbearia/$slug" params={{ slug: s.slug }}>
+                <span className="flex min-h-12 w-full flex-col justify-center rounded-xl border border-border bg-card px-4 py-2 text-left transition-colors hover:border-primary">
+                  <span className="text-sm font-medium">{s.name}</span>
+                  {s.address && <span className="truncate text-xs text-muted-foreground">{s.address}</span>}
+                </span>
+              </Link>
+            ))
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Nenhuma barbearia encontrada com esse nome.
+              {isLink && direct ? " Tentando abrir o link informado:" : ""}
+            </p>
+          )}
+          {hits.length === 0 && !search.isLoading && isLink && direct && (
+            <Link to="/barbearia/$slug" params={{ slug: direct }}>
+              <Button variant="outline" className="h-11 w-full">Abrir link</Button>
+            </Link>
+          )}
+        </div>
+      )}
     </section>
   );
 }

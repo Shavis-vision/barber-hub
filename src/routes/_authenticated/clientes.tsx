@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useMemo, useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,11 @@ export const Route = createFileRoute("/_authenticated/clientes")({
       { property: "og:description", content: "Base de clientes da sua barbearia." },
     ],
   }),
-  component: CustomersPage,
+  component: () => (
+    <RoleGate allow={["owner"]}>
+      <CustomersPage />
+    </RoleGate>
+  ),
 });
 
 function CustomersPage() {

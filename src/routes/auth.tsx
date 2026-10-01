@@ -44,7 +44,7 @@ function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.navigate({ to: "/dashboard" });
+        router.navigate({ to: "/inicio" });
         return;
       }
 
@@ -62,7 +62,7 @@ function AuthPage() {
           setSent("confirm");
           return;
         }
-        router.navigate({ to: "/dashboard" });
+        router.navigate({ to: "/inicio" });
         return;
       }
 
@@ -87,7 +87,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
-    router.navigate({ to: "/dashboard" });
+    router.navigate({ to: "/inicio" });
   }
 
   if (sent) {

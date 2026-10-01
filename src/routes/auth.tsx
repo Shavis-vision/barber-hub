@@ -27,6 +27,7 @@ export const Route = createFileRoute("/auth")({
 });
 
 type Mode = "login" | "signup" | "forgot";
+type AccountType = "client" | "owner";
 
 function AuthPage() {
   const router = useRouter();
@@ -34,6 +35,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shopName, setShopName] = useState("");
+  const [accountType, setAccountType] = useState<AccountType>("client");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState<null | "confirm" | "reset">(null);
 
@@ -54,7 +56,8 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { shop_name: shopName },
+            // Só quem escolhe "Tenho uma barbearia" recebe nome de barbearia (e vira dono).
+            data: accountType === "owner" ? { shop_name: shopName } : {},
           },
         });
         if (error) throw error;
@@ -122,7 +125,7 @@ function AuthPage() {
       </Link>
       <h1 className="mt-3 text-2xl font-semibold">
         {mode === "login" && "Entrar no painel"}
-        {mode === "signup" && "Criar sua barbearia"}
+        {mode === "signup" && (accountType === "owner" ? "Criar sua barbearia" : "Criar sua conta")}
         {mode === "forgot" && "Recuperar senha"}
       </h1>
       <p className="mt-1.5 text-sm text-muted-foreground">
@@ -133,6 +136,27 @@ function AuthPage() {
 
       <form onSubmit={submit} className="mt-7 space-y-4">
         {mode === "signup" && (
+          <div className="grid grid-cols-2 gap-2" role="group" aria-label="Tipo de conta">
+            <Button
+              type="button"
+              variant={accountType === "client" ? "default" : "outline"}
+              className="h-11"
+              onClick={() => setAccountType("client")}
+            >
+              Sou cliente
+            </Button>
+            <Button
+              type="button"
+              variant={accountType === "owner" ? "default" : "outline"}
+              className="h-11"
+              onClick={() => setAccountType("owner")}
+            >
+              Tenho uma barbearia
+            </Button>
+          </div>
+        )}
+
+        {mode === "signup" && accountType === "owner" && (
           <div className="space-y-1.5">
             <Label htmlFor="shop">Nome da barbearia</Label>
             <Input
@@ -210,7 +234,7 @@ function AuthPage() {
             <p className="text-muted-foreground">
               Ainda não tem conta?{" "}
               <button className="font-medium text-primary" onClick={() => setMode("signup")}>
-                Criar barbearia
+                Criar conta
               </button>
             </p>
           </>

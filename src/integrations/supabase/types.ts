@@ -523,6 +523,10 @@ export type Database = {
       }
       is_shop_barber: { Args: { _shop: string }; Returns: boolean }
       owns_shop: { Args: { p_shop: string }; Returns: boolean }
+      search_barbershops: {
+        Args: { p_query: string }
+        Returns: { name: string; slug: string; address: string | null }[]
+      }
     }
     Enums: {
       app_role: "owner" | "barber" | "client"

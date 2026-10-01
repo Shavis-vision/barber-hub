@@ -33,7 +33,7 @@ function ResetPassword() {
       return;
     }
     toast.success("Senha atualizada.");
-    router.navigate({ to: "/dashboard" });
+    router.navigate({ to: "/inicio" });
   }
 
   return (

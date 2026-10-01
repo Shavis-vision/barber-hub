@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -21,7 +22,11 @@ export const Route = createFileRoute("/_authenticated/agendamentos")({
       { property: "og:description", content: "Todos os agendamentos da sua barbearia." },
     ],
   }),
-  component: AppointmentsPage,
+  component: () => (
+    <RoleGate allow={["owner", "barber"]}>
+      <AppointmentsPage />
+    </RoleGate>
+  ),
 });
 
 const FILTERS = ["all", "confirmed", "completed", "cancelled"] as const;

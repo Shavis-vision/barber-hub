@@ -32,7 +32,7 @@ export function RoleGate({ allow, children }: { allow: Role[]; children: ReactNo
           </p>
           <Link to={home} className="mt-6 block">
             <Button className="h-11 w-full">
-              {profile.role === "barber" ? "Ir para minha agenda" : "Voltar ao início"}
+              {profile.role === "barber" ? "Ir para minha agenda" : "Ir para meus agendamentos"}
             </Button>
           </Link>
         </div>

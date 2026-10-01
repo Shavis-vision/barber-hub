@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Plus } from "lucide-react";
@@ -32,7 +33,11 @@ export const Route = createFileRoute("/_authenticated/servicos")({
       { property: "og:description", content: "Serviços oferecidos pela sua barbearia." },
     ],
   }),
-  component: ServicesPage,
+  component: () => (
+    <RoleGate allow={["owner"]}>
+      <ServicesPage />
+    </RoleGate>
+  ),
 });
 
 function ServicesPage() {

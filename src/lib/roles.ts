@@ -70,5 +70,5 @@ export function useAccessProfile() {
 export function homeForRole(role: Role) {
   if (role === "owner") return "/dashboard" as const;
   if (role === "barber") return "/agenda" as const;
-  return "/" as const;
+  return "/cliente" as const;
 }

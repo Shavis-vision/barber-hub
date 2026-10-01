@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -30,7 +31,11 @@ export const Route = createFileRoute("/_authenticated/agenda")({
       { property: "og:description", content: "Agenda da barbearia por dia e por semana." },
     ],
   }),
-  component: AgendaPage,
+  component: () => (
+    <RoleGate allow={["owner", "barber"]}>
+      <AgendaPage />
+    </RoleGate>
+  ),
 });
 
 type View = "day" | "week";

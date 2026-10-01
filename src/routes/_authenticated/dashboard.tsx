@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RoleGate } from "@/components/role-gate";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -27,7 +28,11 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
       { property: "og:description", content: "Visão geral do dia da sua barbearia." },
     ],
   }),
-  component: DashboardPage,
+  component: () => (
+    <RoleGate allow={["owner"]}>
+      <DashboardPage />
+    </RoleGate>
+  ),
 });
 
 function DashboardPage() {

@@ -113,7 +113,13 @@ function useShopSearch(term: string) {
     queryKey: ["shop-search", q],
     enabled: q.length >= 2,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("search_barbershops", { p_query: q });
+      const safe = q.replace(/[%_,()]/g, " ");
+      const { data, error } = await supabase
+        .from("barbershops")
+        .select("name, slug, address")
+        .or(`name.ilike.%${safe}%,slug.ilike.%${safe}%`)
+        .order("name")
+        .limit(20);
       if (error) throw error;
       return (data ?? []) as ShopHit[];
     },

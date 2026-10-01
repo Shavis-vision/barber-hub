@@ -81,6 +81,8 @@ export function useMyShop() {
       if (existing) return existing as unknown as Barbershop;
 
       const meta = (user.user_metadata ?? {}) as { shop_name?: string; full_name?: string };
+      // Só cria barbearia automaticamente para quem se cadastrou como dono.
+      if (!meta.shop_name) return null;
       const { error: rpcError } = await supabase.rpc("bootstrap_barbershop", {
         p_name: meta.shop_name ?? "Minha barbearia",
         p_slug: meta.shop_name ?? "barbearia",

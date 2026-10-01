@@ -71,14 +71,33 @@ export function useMyShop() {
       const user = userData.user;
       if (!user) return null;
 
-      const { data: existing, error } = await supabase
+      // Filtra SEMPRE pelo dono: as barbearias são legíveis por qualquer usuário logado
+      // (vitrine pública), então sem este filtro viria a primeira barbearia de qualquer pessoa.
+      const { data: owned, error } = await supabase
         .from("barbershops")
         .select("*")
+        .eq("owner_id", user.id)
         .order("created_at")
         .limit(1)
         .maybeSingle();
       if (error) throw error;
-      if (existing) return existing as unknown as Barbershop;
+      if (owned) return owned as unknown as Barbershop;
+
+      // Barbeiro vinculado a uma barbearia.
+      const { data: barber } = await supabase
+        .from("barbers")
+        .select("barbershop_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (barber?.barbershop_id) {
+        const { data: shop, error: shopError } = await supabase
+          .from("barbershops")
+          .select("*")
+          .eq("id", barber.barbershop_id)
+          .maybeSingle();
+        if (shopError) throw shopError;
+        if (shop) return shop as unknown as Barbershop;
+      }
 
       const meta = (user.user_metadata ?? {}) as { shop_name?: string; full_name?: string };
       // Só cria barbearia automaticamente para quem se cadastrou como dono.
@@ -92,6 +111,7 @@ export function useMyShop() {
       const { data: created, error: refetch } = await supabase
         .from("barbershops")
         .select("*")
+        .eq("owner_id", user.id)
         .order("created_at")
         .limit(1)
         .maybeSingle();

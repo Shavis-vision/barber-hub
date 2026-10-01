@@ -93,7 +93,7 @@ function ClientPage() {
   );
 }
 
-function NewBooking({ lastShop }: { lastShop?: string }) {
+function NewBooking({ lastShop }: { lastShop?: string | undefined }) {
   const [slug, setSlug] = useState("");
   const clean = slug.trim().replace(/^.*\/barbearia\//, "").replace(/\/$/, "");
   return (

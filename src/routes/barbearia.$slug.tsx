@@ -258,7 +258,7 @@ function Shell({ title, subtitle, children }: { title?: string; subtitle?: strin
   );
 }
 
-function Block({ title, value, onEdit, children }: { title: string; value?: string; onEdit?: () => void; children?: React.ReactNode }) {
+function Block({ title, value, onEdit, children }: { title: string; value?: string | undefined; onEdit?: (() => void) | undefined; children?: React.ReactNode }) {
   return (
     <section className="mt-4 panel p-4">
       <div className="flex items-center justify-between gap-3">

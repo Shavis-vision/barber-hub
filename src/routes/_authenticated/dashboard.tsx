@@ -157,6 +157,12 @@ function DashboardPage() {
           </div>
         </div>
 
+                </div>
+
+        <Link to="/barbeiros" className="mt-3 inline-block text-sm text-primary">
+          Ver resultado por barbeiro
+        </Link>
+
         {lostList.length > 0 && (
           <div className="mt-4 border-t border-border pt-3">
             <p className="label-caps">Cancelados e faltas</p>

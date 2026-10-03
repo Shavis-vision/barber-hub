@@ -54,7 +54,9 @@ function DashboardPage() {
   const { data: barbers } = useBarbers(shop?.id);
 
   const active = (today ?? []).filter((a) => a.status !== "cancelled");
-  const revenue = active.reduce((sum, a) => sum + a.price_cents, 0);
+  const revenue = active
+  .filter((a) => a.status !== "no_show")
+  .reduce((sum, a) => sum + a.price_cents, 0);
   const clientsToday = new Set(active.map((a) => a.customer_id)).size;
 
   return (

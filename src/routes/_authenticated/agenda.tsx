@@ -173,7 +173,7 @@ function AgendaPage() {
                           </span>
                           <span className="min-w-0">
                             <span className="block truncate text-sm font-medium">
-                              {a.customers?.name}
+                              {a.customer_name ?? a.customers?.name}
                             </span>
                             <span className="block truncate text-xs text-muted-foreground">
                               {a.services?.name} · {a.barbers?.name}

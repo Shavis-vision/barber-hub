@@ -104,7 +104,7 @@ function AppointmentsPage() {
                     </span>
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{a.customers?.name}</span>
+                    <span className="block truncate text-sm font-medium">{a.customer_name ?? a.customers?.name}</span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {a.services?.name} · {a.barbers?.name} · {money(a.price_cents)}
                     </span>

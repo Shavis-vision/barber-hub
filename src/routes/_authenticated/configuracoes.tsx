@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { QRCodeCanvas } from "qrcode.react";
+import { Copy, Download } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { RoleGate } from "@/components/role-gate";
 import { Button } from "@/components/ui/button";
@@ -11,6 +13,15 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { maskPhone } from "@/lib/format";
 import { useMyShop, useWorkingHours, type WorkingHour } from "@/lib/shop";
+
+function normalizeSlug(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({
@@ -58,13 +69,25 @@ function ConfigPage() {
   const [savingShop, setSavingShop] = useState(false);
   const [days, setDays] = useState<DayForm[]>([]);
   const [savingHours, setSavingHours] = useState(false);
+  const [slug, setSlug] = useState("");
+  const [slugError, setSlugError] = useState<string | null>(null);
+  const [savingSlug, setSavingSlug] = useState(false);
+  const [origin, setOrigin] = useState("");
+  const qrRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   useEffect(() => {
     if (!shop) return;
     setName(shop.name);
     setPhone(shop.phone ?? "");
     setAddress(shop.address ?? "");
+    setSlug(shop.slug);
   }, [shop]);
+
+  const publicUrl = shop && origin ? `${origin}/barbearia/${shop.slug}` : "";
 
   useEffect(() => {
     if (!hours) return;
@@ -131,6 +154,48 @@ function ConfigPage() {
     }
   }
 
+  async function saveSlug() {
+    if (!shop) return;
+    const next = normalizeSlug(slug);
+    if (next.length < 3) {
+      setSlugError("O link precisa ter pelo menos 3 caracteres.");
+      return;
+    }
+    setSlug(next);
+    if (next === shop.slug) {
+      toast.success("Link mantido.");
+      return;
+    }
+    setSavingSlug(true);
+    const { error } = await supabase.from("barbershops").update({ slug: next }).eq("id", shop.id);
+    setSavingSlug(false);
+    if (error) {
+      if (error.code === "23505") setSlugError("Este link já está em uso. Escolha outro.");
+      else toast.error(error.message);
+      return;
+    }
+    toast.success("Link atualizado. O link antigo deixou de funcionar.");
+    queryClient.invalidateQueries({ queryKey: ["my-shop"] });
+  }
+
+  function downloadQr() {
+    const canvas = qrRef.current;
+    if (!canvas || !shop) return;
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL("image/png");
+    a.download = `qrcode-${shop.slug}.png`;
+    a.click();
+  }
+
+  async function copyLink() {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      toast.success("Link copiado.");
+    } catch {
+      toast.error("Não foi possível copiar o link.");
+    }
+  }
+
   function updateDay(index: number, patch: Partial<DayForm>) {
     setDays((prev) => prev.map((d, i) => (i === index ? { ...d, ...patch } : d)));
   }
@@ -171,22 +236,69 @@ function ConfigPage() {
             />
           </div>
         </div>
-        {shop && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            Página pública de agendamento:{" "}
-            <a
-              className="text-primary"
-              href={`/barbearia/${shop.slug}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              /barbearia/{shop.slug}
-            </a>
-          </p>
-        )}
         <Button className="mt-4 h-11" onClick={saveShop} disabled={savingShop || !shop}>
           {savingShop ? "Salvando…" : "Salvar"}
         </Button>
+      </section>
+
+      <section className="mt-6 panel p-4 sm:p-5">
+        <h2 className="text-sm font-semibold">Página pública de agendamento</h2>
+        {shop && (
+          <p className="mt-1 text-sm text-muted-foreground">
+            Link atual:{" "}
+            <a className="text-primary break-all" href={publicUrl} target="_blank" rel="noreferrer">
+              {publicUrl || `/barbearia/${shop.slug}`}
+            </a>
+          </p>
+        )}
+        <div className="mt-4 space-y-1.5">
+          <Label htmlFor="shop-slug">Final do link</Label>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm text-muted-foreground">/barbearia/</span>
+            <Input
+              id="shop-slug"
+              className="h-11 min-w-0 flex-1 sm:max-w-xs"
+              value={slug}
+              onChange={(e) => {
+                setSlug(e.target.value);
+                setSlugError(null);
+              }}
+              aria-invalid={!!slugError}
+            />
+            <Button className="h-11" onClick={saveSlug} disabled={savingSlug || !shop}>
+              {savingSlug ? "Salvando…" : "Salvar link"}
+            </Button>
+          </div>
+          {slug && normalizeSlug(slug) !== slug && (
+            <p className="text-xs text-muted-foreground">Será salvo como: {normalizeSlug(slug) || "—"}</p>
+          )}
+          {slugError && <p className="text-sm text-destructive">{slugError}</p>}
+          <p className="text-xs text-muted-foreground">
+            Ao alterar, o link antigo deixa de funcionar.
+          </p>
+        </div>
+        {shop && publicUrl && (
+          <div className="mt-5 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <div className="rounded-md border border-border bg-background p-3">
+              <QRCodeCanvas
+                ref={qrRef}
+                value={publicUrl}
+                size={160}
+                marginSize={2}
+                bgColor="#ffffff"
+                fgColor="#000000"
+              />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" className="h-11" onClick={downloadQr}>
+                <Download className="size-4" /> Baixar QR code
+              </Button>
+              <Button variant="outline" className="h-11" onClick={copyLink}>
+                <Copy className="size-4" /> Copiar link
+              </Button>
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="mt-6 panel">

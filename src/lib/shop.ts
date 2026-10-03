@@ -62,7 +62,7 @@ export type AppointmentRow = {
 };
 
 const APPOINTMENT_SELECT =
-  "id, starts_at, ends_at, status, price_cents, notes, barber_id, service_id, customer_id, customers(id,name,phone), services(id,name,duration_minutes), barbers(id,name)";
+  "id, starts_at, ends_at, status, price_cents, notes, barber_id, service_id, customer_id, customer_name, customers(id,name,phone), services(id,name,duration_minutes), barbers(id,name)";
 
 export function useMyShop() {
   return useQuery({

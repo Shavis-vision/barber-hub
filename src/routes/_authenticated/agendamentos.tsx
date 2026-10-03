@@ -57,7 +57,7 @@ function AppointmentsPage() {
         shop && (
           <Button className="h-11 px-4" onClick={() => setCreating(true)}>
             <Plus className="size-4" aria-hidden />
-            <span className="hidden sm:inline">Novo</span>
+            <span className="hidden sm:inline">Novo agendamento</span>
           </Button>
         )
       }

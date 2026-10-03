@@ -157,8 +157,6 @@ function DashboardPage() {
           </div>
         </div>
 
-                </div>
-
         <Link to="/barbeiros" className="mt-3 inline-block text-sm text-primary">
           Ver resultado por barbeiro
         </Link>

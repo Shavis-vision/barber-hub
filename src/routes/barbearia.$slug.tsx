@@ -6,8 +6,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
-import { groupSlots, useAvailableSlots } from "@/lib/booking";
-import { addDays, hhmm, longDate, maskPhone, money, shortDate, toDateKey, weekdayShort } from "@/lib/format";
+import { fetchSlots, groupSlots, useAvailableSlots } from "@/lib/booking";
+import { addDays, fromDateKey, hhmm, longDate, maskPhone, money, shortDate, toDateKey, weekdayShort } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/barbearia/$slug")({
@@ -37,16 +37,18 @@ function usePublicShop(slug: string) {
         .maybeSingle();
       if (error) throw error;
       if (!shop) return null;
-      const [svc, brb, link] = await Promise.all([
+      const [svc, brb, link, wh] = await Promise.all([
         supabase.from("services").select("id, name, description, price_cents, duration_minutes").eq("barbershop_id", shop.id).eq("active", true).order("created_at"),
         supabase.from("barbers").select("id, name").eq("barbershop_id", shop.id).eq("active", true).order("name"),
         supabase.from("barber_services").select("barber_id, service_id").eq("barbershop_id", shop.id),
+        supabase.from("working_hours").select("barber_id, weekday, is_open").eq("barbershop_id", shop.id),
       ]);
       return {
         shop: shop as Shop,
         services: (svc.data ?? []) as Svc[],
         barbers: (brb.data ?? []) as Brb[],
         links: (link.data ?? []) as { barber_id: string; service_id: string }[],
+        hours: (wh.data ?? []) as { barber_id: string | null; weekday: number; is_open: boolean }[],
       };
     },
   });
@@ -70,6 +72,34 @@ function PublicBooking() {
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(new Date(), i)), []);
   const slots = useAvailableSlots(slug, serviceId, barberId ?? null, dateKey);
   const grouped = groupSlots(slots.data ?? []);
+
+  const emptyReason = (() => {
+    if (!data || !dateKey || slots.isLoading || slots.isError || grouped.length > 0) return null;
+    const wd = fromDateKey(dateKey).getDay();
+    const shopDay = data.hours.find((h) => h.barber_id === null && h.weekday === wd);
+    if (!shopDay || !shopDay.is_open) return "closed" as const;
+    if (barberId) {
+      const own = data.hours.filter((h) => h.barber_id === barberId);
+      const day = own.find((h) => h.weekday === wd);
+      if (own.length > 0 && (!day || !day.is_open)) return "barber_off" as const;
+    }
+    return "full" as const;
+  })();
+
+  const nextFree = useQuery({
+    queryKey: ["next-free", slug, serviceId, barberId ?? null, dateKey],
+    enabled: emptyReason === "full",
+    staleTime: 15_000,
+    queryFn: async () => {
+      const start = fromDateKey(dateKey!);
+      for (let i = 1; i <= 14; i++) {
+        const key = toDateKey(addDays(start, i));
+        const found = await fetchSlots(slug, serviceId!, barberId ?? null, key);
+        if (found.length > 0) return key;
+      }
+      return null;
+    },
+  });
 
   const step = !serviceId ? 0 : barberId === undefined ? 1 : !dateKey ? 2 : !slot ? 3 : 4;
 
@@ -211,7 +241,34 @@ function PublicBooking() {
               Erro ao buscar horários: {(slots.error as Error).message}
             </p>
           ) : grouped.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Não há horários disponíveis para esta data.</p>
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                {emptyReason === "closed"
+                  ? "Barbearia fechada neste dia."
+                  : emptyReason === "barber_off"
+                    ? "Este barbeiro não atende neste dia."
+                    : "Nenhum horário disponível para este dia."}
+              </p>
+              {emptyReason === "full" && (
+                <div className="flex flex-wrap gap-2">
+                  {nextFree.isLoading ? (
+                    <span className="text-sm text-muted-foreground">Procurando o próximo dia livre…</span>
+                  ) : nextFree.data ? (
+                    <Button className="h-11" onClick={() => { setDateKey(nextFree.data!); setSlot(null); }}>
+                      Próximo dia livre: {weekdayShort(fromDateKey(nextFree.data).getDay())} {shortDate(fromDateKey(nextFree.data))}
+                    </Button>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">Sem horários livres nos próximos 14 dias.</span>
+                  )}
+                  {barberId && barbersForService.length > 1 && (
+                    <Button variant="outline" className="h-11" onClick={() => { setBarberId(undefined); setSlot(null); }}>
+                      Escolher outro barbeiro
+                    </Button>
+                  )}
+                </div>
+              )}
+              <p className="text-xs text-muted-foreground">Ou escolha outra data acima.</p>
+            </div>
           ) : (
             <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
               {grouped.map((g) => (

@@ -103,7 +103,7 @@ function DashboardPage() {
                     {hhmm(a.starts_at)}
                   </span>
                   <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{a.customers?.name}</span>
+                    <span className="block truncate text-sm font-medium">{a.customer_name ?? a.customers?.name}</span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {shortDate(new Date(a.starts_at))} · {a.services?.name} · {a.barbers?.name}
                     </span>

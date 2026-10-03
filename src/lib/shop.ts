@@ -55,6 +55,7 @@ export type AppointmentRow = {
   barber_id: string;
   service_id: string;
   customer_id: string;
+  customer_name: string | null;
   customers: { id: string; name: string; phone: string } | null;
   services: { id: string; name: string; duration_minutes: number } | null;
   barbers: { id: string; name: string } | null;

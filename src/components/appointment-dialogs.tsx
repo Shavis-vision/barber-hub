@@ -363,7 +363,7 @@ export function AppointmentDetailDialog({
           <>
             <DialogHeader>
               <DialogTitle className="numeric">
-                {hhmm(appointment.starts_at)} · {appointment.customers?.name}
+                {hhmm(appointment.starts_at)} · {appointment.customer_name ?? appointment.customers?.name}
               </DialogTitle>
               <DialogDescription>
                 {longDate(new Date(appointment.starts_at))}

@@ -94,6 +94,54 @@ export type Database = {
           },
         ]
       }
+      barber_invites: {
+        Row: {
+          barber_id: string
+          barbershop_id: string
+          code: string
+          created_at: string
+          expires_at: string
+          id: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          barber_id: string
+          barbershop_id: string
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          barber_id?: string
+          barbershop_id?: string
+          code?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_invites_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "barber_invites_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       barber_services: {
         Row: {
           barber_id: string
@@ -492,6 +540,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_barber_invite: { Args: { p_code: string }; Returns: Json }
       available_slots: {
         Args: {
           p_barber: string
@@ -520,6 +569,7 @@ export type Database = {
         Returns: string
       }
       current_barber_id: { Args: never; Returns: string }
+      get_barber_invite: { Args: { p_code: string }; Returns: Json }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

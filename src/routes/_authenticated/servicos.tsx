@@ -131,6 +131,8 @@ function ServiceDialog({
   const [duration, setDuration] = useState(30);
   const [active, setActive] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [key, setKey] = useState<string | null>(null);
 
   const currentKey = service?.id ?? "new";
@@ -141,6 +143,7 @@ function ServiceDialog({
     setPrice(service?.price_cents ?? 0);
     setDuration(service?.duration_minutes ?? 30);
     setActive(service?.active ?? true);
+    setConfirmDelete(false);
   }
   if (!open && key !== null) setKey(null);
 
@@ -169,6 +172,64 @@ function ServiceDialog({
     toast.success(service ? "Serviço salvo." : "Serviço criado.");
     queryClient.invalidateQueries({ queryKey: ["services"] });
     onOpenChange(false);
+  }
+
+  async function remove() {
+    if (!service) return;
+    setDeleting(true);
+
+    // Não exclui se ainda houver agendamentos futuros usando este serviço.
+    const { count, error: countError } = await supabase
+      .from("appointments")
+      .select("id", { count: "exact", head: true })
+      .eq("service_id", service.id)
+      .gte("starts_at", new Date().toISOString())
+      .in("status", ["pending", "confirmed"]);
+    if (countError) {
+      setDeleting(false);
+      toast.error(countError.message);
+      return;
+    }
+    if ((count ?? 0) > 0) {
+      setDeleting(false);
+      setConfirmDelete(false);
+      toast.error(
+        `Há ${count} ${count === 1 ? "agendamento futuro" : "agendamentos futuros"} com este serviço. Cancele ou conclua antes de excluir.`,
+      );
+      return;
+    }
+
+    // 1) Tenta excluir de verdade. O banco recusa se existir histórico de agendamentos.
+    const { error } = await supabase.from("services").delete().eq("id", service.id);
+    if (!error) {
+      setDeleting(false);
+      toast.success("Serviço excluído.");
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      onOpenChange(false);
+      return;
+    }
+
+    // 2) Tem histórico: o serviço sai da lista e dos agendamentos, mas o registro fica guardado.
+    if (error.code === "23503") {
+      await supabase.from("barber_services").delete().eq("service_id", service.id);
+      const { error: archiveError } = await supabase
+        .from("services")
+        .update({ active: false, archived_at: new Date().toISOString() })
+        .eq("id", service.id);
+      setDeleting(false);
+      if (archiveError) {
+        toast.error(archiveError.message);
+        return;
+      }
+      toast.success("Serviço removido. O histórico dos agendamentos foi mantido.");
+      queryClient.invalidateQueries({ queryKey: ["services"] });
+      queryClient.invalidateQueries({ queryKey: ["barber-services"] });
+      onOpenChange(false);
+      return;
+    }
+
+    setDeleting(false);
+    toast.error(error.message);
   }
 
   return (
@@ -234,9 +295,49 @@ function ServiceDialog({
             <Switch id="svc-active" checked={active} onCheckedChange={setActive} />
           </div>
 
-          <Button onClick={save} disabled={saving} className="h-12 w-full">
+          <Button onClick={save} disabled={saving || deleting} className="h-12 w-full">
             {saving ? "Salvando…" : "Salvar"}
           </Button>
+
+          {service && !confirmDelete && (
+            <Button
+              type="button"
+              variant="outline"
+              className="h-11 w-full text-destructive"
+              onClick={() => setConfirmDelete(true)}
+              disabled={saving || deleting}
+            >
+              Excluir serviço
+            </Button>
+          )}
+
+          {service && confirmDelete && (
+            <div className="space-y-3 rounded-lg border border-destructive/40 px-3.5 py-3">
+              <p className="text-sm">
+                Excluir <strong>{service.name}</strong>? Ele deixa de aparecer na lista e no
+                agendamento. Os atendimentos já feitos continuam no histórico.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11"
+                  onClick={() => setConfirmDelete(false)}
+                  disabled={deleting}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  className="h-11 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  onClick={remove}
+                  disabled={deleting}
+                >
+                  {deleting ? "Excluindo…" : "Sim, excluir"}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

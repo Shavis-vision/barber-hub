@@ -23,5 +23,10 @@ function StartPage() {
       </div>
     );
   }
+  const pendingInvite =
+    typeof window !== "undefined" ? sessionStorage.getItem("navalha:pending-invite") : null;
+  if (pendingInvite && /^[a-f0-9]{64}$/.test(pendingInvite)) {
+    return <Navigate to="/convite/$code" params={{ code: pendingInvite }} replace />;
+  }
   return <Navigate to={homeForRole(profile.role)} replace />;
 }

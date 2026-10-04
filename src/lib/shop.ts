@@ -27,6 +27,7 @@ export type Barber = {
   phone: string | null;
   photo_url: string | null;
   active: boolean;
+  user_id?: string | null;
 };
 
 export type WorkingHour = {

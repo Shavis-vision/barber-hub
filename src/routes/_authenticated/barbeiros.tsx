@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RoleGate } from "@/components/role-gate";
+import { InviteSection } from "@/components/barber-invite";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
@@ -387,6 +388,8 @@ function BarberDialog({
             </Label>
             <Switch id="barber-active" checked={active} onCheckedChange={setActive} />
           </div>
+
+          {barber && <InviteSection shopId={shopId} barber={barber} />}
 
           <Button onClick={save} disabled={saving} className="h-12 w-full">
             {saving ? "Salvando…" : "Salvar"}

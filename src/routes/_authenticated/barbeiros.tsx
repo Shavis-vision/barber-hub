@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RoleGate } from "@/components/role-gate";
+import { InviteSection } from "@/components/barber-invite";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";

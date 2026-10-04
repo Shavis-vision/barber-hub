@@ -132,6 +132,7 @@ export function useServices(shopId?: string) {
         .from("services")
         .select("*")
         .eq("barbershop_id", shopId!)
+        .is("archived_at", null)
         .order("created_at");
       if (error) throw error;
       return (data ?? []) as unknown as Service[];

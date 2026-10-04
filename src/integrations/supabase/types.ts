@@ -21,6 +21,7 @@ export type Database = {
           booked_by: string | null
           created_at: string
           customer_id: string
+          customer_name: string | null
           ends_at: string
           id: string
           notes: string | null
@@ -36,6 +37,7 @@ export type Database = {
           booked_by?: string | null
           created_at?: string
           customer_id: string
+          customer_name?: string | null
           ends_at: string
           id?: string
           notes?: string | null
@@ -51,6 +53,7 @@ export type Database = {
           booked_by?: string | null
           created_at?: string
           customer_id?: string
+          customer_name?: string | null
           ends_at?: string
           id?: string
           notes?: string | null
@@ -366,6 +369,7 @@ export type Database = {
       services: {
         Row: {
           active: boolean
+          archived_at: string | null
           barbershop_id: string
           created_at: string
           description: string | null
@@ -376,6 +380,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          archived_at?: string | null
           barbershop_id: string
           created_at?: string
           description?: string | null
@@ -386,6 +391,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          archived_at?: string | null
           barbershop_id?: string
           created_at?: string
           description?: string | null

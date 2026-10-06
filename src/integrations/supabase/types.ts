@@ -142,6 +142,42 @@ export type Database = {
           },
         ]
       }
+      barber_commissions: {
+        Row: {
+          barber_id: string
+          barbershop_id: string
+          percent: number
+          updated_at: string
+        }
+        Insert: {
+          barber_id: string
+          barbershop_id: string
+          percent?: number
+          updated_at?: string
+        }
+        Update: {
+          barber_id?: string
+          barbershop_id?: string
+          percent?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_commissions_barber_id_fkey"
+            columns: ["barber_id"]
+            isOneToOne: true
+            referencedRelation: "barbers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "barber_commissions_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       barber_services: {
         Row: {
           barber_id: string

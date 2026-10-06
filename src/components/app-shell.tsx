@@ -11,6 +11,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useMyShop } from "@/lib/shop";
 import { useAccessProfile, type Role } from "@/lib/roles";
@@ -50,14 +51,17 @@ export function AppShell({
   const { data: profile } = useAccessProfile();
   const role: Role = profile?.role ?? "client";
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const nav = NAV.filter((item) => (item.roles as readonly Role[]).includes(role));
   const mobilePaths = role === "barber" ? MOBILE_FOR_BARBER : MOBILE_FOR_OWNER;
   const mobileNav = nav.filter((item) => mobilePaths.includes(item.to));
 
   async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
     await supabase.auth.signOut();
-    router.navigate({ to: "/auth" });
+    router.navigate({ to: "/auth", replace: true });
   }
 
   return (

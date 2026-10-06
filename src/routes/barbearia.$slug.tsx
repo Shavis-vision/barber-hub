@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,10 @@ function PublicBooking() {
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState<{ starts_at: string; barber_id: string } | null>(null);
+  const [signedIn, setSignedIn] = useState(false);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
+  }, [done]);
 
   const days = useMemo(() => Array.from({ length: 14 }, (_, i) => addDays(new Date(), i)), []);
   const slots = useAvailableSlots(slug, serviceId, barberId ?? null, dateKey);
@@ -155,9 +159,15 @@ function PublicBooking() {
           <p className="numeric mt-1 text-sm font-medium">
             {longDate(new Date(done.starts_at))} às {hhmm(done.starts_at)}
           </p>
-          <Link to="/cliente" className="mt-6 block">
-            <Button variant="outline" className="h-11 w-full">Ver meus agendamentos</Button>
-          </Link>
+          {signedIn ? (
+            <Link to="/cliente" className="mt-6 block">
+              <Button variant="outline" className="h-11 w-full">Ver meus agendamentos</Button>
+            </Link>
+          ) : (
+            <Link to="/auth" className="mt-6 block">
+              <Button variant="outline" className="h-11 w-full">Entrar para ver meus agendamentos</Button>
+            </Link>
+          )}
         </div>
       </Shell>
     );

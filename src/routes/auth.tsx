@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +32,7 @@ type AccountType = "client" | "owner";
 
 function AuthPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -46,7 +48,8 @@ function AuthPage() {
       if (mode === "login") {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        router.navigate({ to: "/inicio" });
+        queryClient.clear();
+    router.navigate({ to: "/inicio" });
         return;
       }
 
@@ -65,7 +68,8 @@ function AuthPage() {
           setSent("confirm");
           return;
         }
-        router.navigate({ to: "/inicio" });
+        queryClient.clear();
+    router.navigate({ to: "/inicio" });
         return;
       }
 
@@ -90,6 +94,7 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
+    queryClient.clear();
     router.navigate({ to: "/inicio" });
   }
 

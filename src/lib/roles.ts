@@ -18,13 +18,22 @@ const GUEST: AccessProfile = { userId: null, role: "client", barberId: null, bar
  * aqui apenas lemos para adaptar a interface. A proteção real é RLS + guarda de rota.
  */
 export function useAccessProfile() {
+  const { data: sessionUserId } = useQuery({
+    queryKey: ["access-profile", "session-user"],
+    staleTime: 0,
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session?.user.id ?? null;
+    },
+  });
   return useQuery({
-    queryKey: ["access-profile"],
+    queryKey: ["access-profile", sessionUserId ?? "guest"],
+    enabled: sessionUserId !== undefined,
     staleTime: 60_000,
     queryFn: async (): Promise<AccessProfile> => {
       const { data: userData } = await supabase.auth.getUser();
       const user = userData.user;
-      if (!user) return GUEST;
+      if (!user || user.id !== sessionUserId) return GUEST;
 
       const [{ data: roles }, { data: barber }] = await Promise.all([
         supabase.from("user_roles").select("role, barbershop_id").eq("user_id", user.id),

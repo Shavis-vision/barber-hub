@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { RoleGate } from "@/components/role-gate";
 import { InviteSection } from "@/components/barber-invite";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { toast } from "sonner";
@@ -67,11 +67,30 @@ function periodRange(period: Period) {
   return { from: today.toISOString(), to: addDays(today, 1).toISOString() };
 }
 
+/** Porcentagem de comissão de cada barbeiro (só o dono lê e altera). */
+function useCommissions(shopId?: string) {
+  return useQuery({
+    queryKey: ["barber-commissions", shopId],
+    enabled: !!shopId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("barber_commissions")
+        .select("barber_id, percent")
+        .eq("barbershop_id", shopId!);
+      if (error) throw error;
+      const map: Record<string, number> = {};
+      for (const row of data ?? []) map[row.barber_id] = Number(row.percent);
+      return map;
+    },
+  });
+}
+
 function BarbersPage() {
   const { data: shop } = useMyShop();
   const { data: barbers, isLoading } = useBarbers(shop?.id);
   const { data: services } = useServices(shop?.id);
   const { data: links } = useBarberServices(shop?.id);
+  const { data: commissions } = useCommissions(shop?.id);
   const [editing, setEditing] = useState<Barber | null>(null);
   const [open, setOpen] = useState(false);
   const [period, setPeriod] = useState<Period>("day");
@@ -108,6 +127,11 @@ function BarbersPage() {
   })();
   const totalCount = results.reduce((sum, r) => sum + r.count, 0);
   const totalCents = results.reduce((sum, r) => sum + r.cents, 0);
+
+  // Comissão = porcentagem do valor dos atendimentos concluídos no período.
+  const commissionOf = (id: string, cents: number) =>
+    Math.round((cents * (commissions?.[id] ?? 0)) / 100);
+  const totalCommission = results.reduce((sum, r) => sum + commissionOf(r.id, r.cents), 0);
 
   return (
     <AppShell
@@ -203,7 +227,14 @@ function BarbersPage() {
                     {r.cancelled > 0 && ` · ${r.cancelled} ${r.cancelled === 1 ? "cancelado" : "cancelados"}`}
                   </span>
                 </span>
-                <span className="numeric text-base font-semibold">{money(r.cents)}</span>
+                <span className="text-right">
+                  <span className="numeric block text-base font-semibold">{money(r.cents)}</span>
+                  {(commissions?.[r.id] ?? 0) > 0 && (
+                    <span className="numeric block text-xs text-muted-foreground">
+                      Comissão {commissions![r.id]}% · {money(commissionOf(r.id, r.cents))}
+                    </span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>
@@ -214,6 +245,12 @@ function BarbersPage() {
             Total: {totalCount} · {money(totalCents)}
           </span>
         </footer>
+        {totalCommission > 0 && (
+          <footer className="flex flex-wrap items-center justify-between gap-x-4 border-t border-border px-4 py-2 text-xs text-muted-foreground">
+            <span className="numeric">A pagar em comissões: {money(totalCommission)}</span>
+            <span className="numeric">Fica na barbearia: {money(totalCents - totalCommission)}</span>
+          </footer>
+        )}
       </section>
 
       <p className="mt-4 text-sm text-muted-foreground">
@@ -224,6 +261,7 @@ function BarbersPage() {
         <BarberDialog
           shopId={shop.id}
           barber={editing}
+          commission={editing ? commissions?.[editing.id] : undefined}
           services={(services ?? []).map((s) => ({ id: s.id, name: s.name }))}
           selectedServiceIds={(links ?? [])
             .filter((l) => l.barber_id === editing?.id)
@@ -242,6 +280,7 @@ function BarbersPage() {
 function BarberDialog({
   shopId,
   barber,
+  commission,
   services,
   selectedServiceIds,
   open,
@@ -249,6 +288,7 @@ function BarberDialog({
 }: {
   shopId: string;
   barber: Barber | null;
+  commission?: number;
   services: { id: string; name: string }[];
   selectedServiceIds: string[];
   open: boolean;
@@ -258,6 +298,7 @@ function BarberDialog({
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [active, setActive] = useState(true);
+  const [commissionText, setCommissionText] = useState("");
   const [chosen, setChosen] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [key, setKey] = useState<string | null>(null);
@@ -268,6 +309,7 @@ function BarberDialog({
     setName(barber?.name ?? "");
     setPhone(barber?.phone ?? "");
     setActive(barber?.active ?? true);
+    setCommissionText(commission ? String(commission).replace(".", ",") : "");
     setChosen(barber ? selectedServiceIds : services.map((s) => s.id));
   }
   if (!open && key !== null) setKey(null);
@@ -279,6 +321,11 @@ function BarberDialog({
   async function save() {
     if (!name.trim()) {
       toast.error("Informe o nome do barbeiro.");
+      return;
+    }
+    const percent = commissionText.trim() === "" ? 0 : Number(commissionText.replace(",", "."));
+    if (!Number.isFinite(percent) || percent < 0 || percent > 100) {
+      toast.error("A comissão deve ser um número entre 0 e 100.");
       return;
     }
     setSaving(true);
@@ -300,6 +347,19 @@ function BarberDialog({
         barberId = (data as { id: string }).id;
       }
 
+      const { error: commissionError } = await supabase
+        .from("barber_commissions")
+        .upsert(
+          {
+            barber_id: barberId!,
+            barbershop_id: shopId,
+            percent: Math.round(percent * 100) / 100,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "barber_id" },
+        );
+      if (commissionError) throw commissionError;
+
       const { error: delError } = await supabase
         .from("barber_services")
         .delete()
@@ -319,6 +379,7 @@ function BarberDialog({
 
       toast.success(barber ? "Barbeiro salvo." : "Barbeiro criado.");
       queryClient.invalidateQueries({ queryKey: ["barbers"] });
+      queryClient.invalidateQueries({ queryKey: ["barber-commissions"] });
       queryClient.invalidateQueries({ queryKey: ["barber-services"] });
       queryClient.invalidateQueries({ queryKey: ["slots"] });
       onOpenChange(false);
@@ -361,6 +422,21 @@ function BarberDialog({
               onChange={(e) => setPhone(maskPhone(e.target.value))}
               placeholder="(11) 99999-9999"
             />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="barber-commission">Comissão (%)</Label>
+            <Input
+              id="barber-commission"
+              className="h-11"
+              inputMode="decimal"
+              value={commissionText}
+              onChange={(e) => setCommissionText(e.target.value.replace(/[^0-9.,]/g, ""))}
+              placeholder="Ex.: 40"
+            />
+            <p className="text-xs text-muted-foreground">
+              Parte do valor dos atendimentos concluídos que fica com o barbeiro. Só o dono vê.
+            </p>
           </div>
 
           <div className="space-y-2">

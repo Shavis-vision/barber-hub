@@ -288,7 +288,7 @@ function BarberDialog({
 }: {
   shopId: string;
   barber: Barber | null;
-  commission?: number;
+  commission?: number | undefined;
   services: { id: string; name: string }[];
   selectedServiceIds: string[];
   open: boolean;

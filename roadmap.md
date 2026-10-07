@@ -28,3 +28,4 @@
 
 ## SEO
 - [ ] head() por rota
+- [ ] /cliente: corrigir só defeitos de celular (texto cortado, rolagem horizontal, botões pequenos), preservando layout/textos

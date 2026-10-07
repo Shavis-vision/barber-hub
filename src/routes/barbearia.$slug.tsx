@@ -445,7 +445,7 @@ function Choice({ onClick, avatar, children }: { onClick: () => void; avatar: Re
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value?: string }) {
+function SummaryRow({ label, value }: { label: string; value?: string | undefined }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-3">
       <dt className="text-muted-foreground">{label}</dt>

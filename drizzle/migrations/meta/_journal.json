@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791402027231,
+      "tag": "0000_barber_read_own_commission",
+      "breakpoints": true
+    }
+  ]
+}

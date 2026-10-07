@@ -75,7 +75,7 @@ function ClientPage() {
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
           <p className="font-display text-lg font-semibold tracking-tight">Navalha</p>
-          <Button variant="ghost" className="h-10" onClick={signOut}>
+          <Button variant="ghost" className="h-11" onClick={signOut}>
             <LogOut className="size-4" aria-hidden /> Sair
           </Button>
         </div>

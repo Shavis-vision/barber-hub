@@ -428,7 +428,7 @@ function Block({ n, title, done, value, onEdit, children }: { n: number; title: 
           {value && <p className="truncate text-sm font-medium">{value}</p>}
         </div>
         {onEdit && (
-          <button className="h-9 shrink-0 rounded-md px-2 text-sm font-medium text-primary hover:bg-muted" onClick={onEdit}>Alterar</button>
+          <button className="h-11 shrink-0 rounded-md px-3 text-sm font-medium text-primary hover:bg-muted" onClick={onEdit}>Alterar</button>
         )}
       </div>
       {children && <div className="mt-4">{children}</div>}

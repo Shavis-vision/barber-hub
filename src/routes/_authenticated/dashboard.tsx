@@ -161,7 +161,7 @@ function DashboardPage() {
               <Button
                 key={key}
                 type="button"
-                size="sm"
+                size="sm" className="h-11 px-4"
                 variant={period === key ? "default" : "outline"}
                 onClick={() => setPeriod(key)}
               >

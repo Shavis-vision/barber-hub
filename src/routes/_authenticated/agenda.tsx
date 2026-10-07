@@ -114,7 +114,7 @@ function AgendaPage() {
               onClick={() => setView(v)}
               aria-pressed={view === v}
               className={cn(
-                "h-9 flex-1 rounded-md px-4 text-sm font-medium transition-colors",
+                "h-11 flex-1 rounded-md px-4 text-sm font-medium transition-colors",
                 view === v ? "bg-primary text-primary-foreground" : "text-muted-foreground",
               )}
             >

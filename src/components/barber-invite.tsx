@@ -86,7 +86,7 @@ export function InviteSection({ shopId, barber }: { shopId: string; barber: Barb
       {linked ? (
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground">Conta ligada</span>
-          <Button type="button" variant="outline" size="sm" onClick={unlink} disabled={busy}>
+          <Button type="button" variant="outline" size="sm" className="h-11 px-4" onClick={unlink} disabled={busy}>
             Desvincular
           </Button>
         </div>
@@ -104,7 +104,7 @@ export function InviteSection({ shopId, barber }: { shopId: string; barber: Barb
           <div className="flex gap-2">
             <Button
               type="button"
-              size="sm"
+              size="sm" className="h-11 px-4"
               onClick={async () => {
                 await navigator.clipboard.writeText(link);
                 toast.success("Link copiado.");
@@ -112,7 +112,7 @@ export function InviteSection({ shopId, barber }: { shopId: string; barber: Barb
             >
               <Copy className="size-4" aria-hidden /> Copiar link
             </Button>
-            <Button type="button" size="sm" variant="outline" onClick={generate} disabled={busy}>
+            <Button type="button" size="sm" className="h-11 px-4" variant="outline" onClick={generate} disabled={busy}>
               Gerar novo
             </Button>
           </div>
@@ -120,7 +120,7 @@ export function InviteSection({ shopId, barber }: { shopId: string; barber: Barb
       ) : (
         <div className="flex items-center justify-between gap-3">
           <span className="text-sm text-muted-foreground">Sem conta ligada</span>
-          <Button type="button" size="sm" onClick={generate} disabled={busy}>
+          <Button type="button" size="sm" className="h-11 px-4" onClick={generate} disabled={busy}>
             Convidar
           </Button>
         </div>

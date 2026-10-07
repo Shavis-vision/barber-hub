@@ -29,3 +29,5 @@
 ## SEO
 - [ ] head() por rota
 - [ ] /cliente: corrigir só defeitos de celular (texto cortado, rolagem horizontal, botões pequenos), preservando layout/textos
+- [ ] Meu perfil (barbeiro): quadro "Meu resultado" Hoje/Semana/Mês + política de leitura da própria comissão
+- [ ] Revisão de celular (360–430px) das telas do dono, barbeiro, página pública e /cliente

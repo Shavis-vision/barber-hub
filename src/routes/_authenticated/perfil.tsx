@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { AppShell } from "@/components/app-shell";
 import { RoleGate } from "@/components/role-gate";
 import { supabase } from "@/integrations/supabase/client";
-import { money } from "@/lib/format";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { addDays, money, startOfWeek } from "@/lib/format";
 import { useAccessProfile } from "@/lib/roles";
 
 export const Route = createFileRoute("/_authenticated/perfil")({
@@ -77,6 +79,8 @@ function ProfilePage() {
             </p>
           </section>
 
+          {profile?.role === "barber" && <MyResult barberId={barberId} />}
+
           <section className="mt-6 panel">
             <header className="border-b border-border px-4 py-3">
               <h2 className="text-sm font-semibold">Serviços que você realiza</h2>
@@ -101,5 +105,80 @@ function ProfilePage() {
         </>
       )}
     </AppShell>
+  );
+}
+
+type Period = "day" | "week" | "month";
+const PERIOD_LABEL: Record<Period, string> = { day: "Hoje", week: "Semana", month: "Mês" };
+
+function periodRange(period: Period) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (period === "week") {
+    const start = startOfWeek(today);
+    return { from: start.toISOString(), to: addDays(start, 7).toISOString() };
+  }
+  if (period === "month") {
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+    return { from: start.toISOString(), to: end.toISOString() };
+  }
+  return { from: today.toISOString(), to: addDays(today, 1).toISOString() };
+}
+
+function MyResult({ barberId }: { barberId: string }) {
+  const [period, setPeriod] = useState<Period>("day");
+  const { from, to } = useMemo(() => periodRange(period), [period]);
+
+  const { data } = useQuery({
+    queryKey: ["my-result", barberId, from, to],
+    queryFn: async () => {
+      // RLS: o barbeiro só lê os próprios agendamentos e a própria comissão.
+      const [{ data: appts, error }, { data: comm }] = await Promise.all([
+        supabase
+          .from("appointments")
+          .select("price_cents")
+          .eq("barber_id", barberId)
+          .eq("status", "completed")
+          .gte("starts_at", from)
+          .lt("starts_at", to),
+        supabase.from("barber_commissions").select("percent").eq("barber_id", barberId).maybeSingle(),
+      ]);
+      if (error) throw error;
+      const total = (appts ?? []).reduce((sum, a) => sum + (a.price_cents ?? 0), 0);
+      return { count: (appts ?? []).length, total, percent: comm ? Number(comm.percent) : null };
+    },
+  });
+
+  const percent = data?.percent ?? null;
+
+  return (
+    <section className="mt-6 panel overflow-hidden">
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+        <h2 className="text-sm font-semibold">Meu resultado</h2>
+        <div className="flex gap-2" role="group" aria-label="Período do resultado">
+          {(Object.keys(PERIOD_LABEL) as Period[]).map((key) => (
+            <Button key={key} type="button" className="h-10" variant={period === key ? "default" : "outline"} onClick={() => setPeriod(key)}>
+              {PERIOD_LABEL[key]}
+            </Button>
+          ))}
+        </div>
+      </header>
+      <dl className="grid grid-cols-2 divide-x divide-border">
+        <div className="p-4">
+          <dt className="label-caps">Clientes atendidos</dt>
+          <dd className="numeric mt-1 text-xl font-semibold">{data?.count ?? 0}</dd>
+        </div>
+        <div className="p-4">
+          <dt className="label-caps">Faturado</dt>
+          <dd className="numeric mt-1 text-xl font-semibold">{money(data?.total ?? 0)}</dd>
+        </div>
+      </dl>
+      {percent !== null && percent > 0 && (
+        <p className="numeric border-t border-border px-4 py-3 text-sm">
+          Minha comissão: {percent}% · {money(Math.round(((data?.total ?? 0) * percent) / 100))}
+        </p>
+      )}
+    </section>
   );
 }

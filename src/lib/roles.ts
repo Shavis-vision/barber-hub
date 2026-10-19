@@ -65,6 +65,34 @@ export function useAccessProfile() {
       }
 
       const hasBarberRole = list.some((r) => r.role === "barber");
+
+      // Dono recém-cadastrado: a barbearia ainda não existe. Cria agora (a função do banco só
+      // cria se o usuário ainda não tiver uma) e lê o papel de novo.
+      const shopName = (user.user_metadata as { shop_name?: string } | null)?.shop_name?.trim();
+      if (shopName && !hasBarberRole) {
+        const { error: bootstrapError } = await supabase.rpc("bootstrap_barbershop", {
+          p_name: shopName,
+          p_slug: shopName,
+        });
+        if (!bootstrapError) {
+          const { data: refreshed } = await supabase
+            .from("user_roles")
+            .select("role, barbershop_id")
+            .eq("user_id", user.id);
+          const created = ((refreshed ?? []) as { role: Role; barbershop_id: string | null }[]).find(
+            (r) => r.role === "owner",
+          );
+          if (created) {
+            return {
+              userId: user.id,
+              role: "owner",
+              barberId: null,
+              barbershopId: created.barbershop_id,
+            };
+          }
+        }
+      }
+
       return {
         userId: user.id,
         role: hasBarberRole ? "barber" : "client",

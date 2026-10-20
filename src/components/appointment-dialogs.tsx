@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { DatePickerField } from "@/components/date-picker-field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -220,13 +221,11 @@ export function NewAppointmentDialog({
 
           <div className="space-y-1.5">
             <Label htmlFor="date">Data</Label>
-            <Input
+            <DatePickerField
               id="date"
-              type="date"
-              className="h-11"
               value={dateKey}
-              onChange={(e) => {
-                setDateKey(e.target.value);
+              onChange={(value) => {
+                setDateKey(value);
                 setSlot(null);
               }}
             />
@@ -404,13 +403,11 @@ export function AppointmentDetailDialog({
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="new-date">Nova data</Label>
-                  <Input
+                  <DatePickerField
                     id="new-date"
-                    type="date"
-                    className="h-11"
                     value={dateKey || toDateKey(new Date(appointment.starts_at))}
-                    onChange={(e) => {
-                      setDateKey(e.target.value);
+                    onChange={(value) => {
+                      setDateKey(value);
                       setSlot(null);
                     }}
                   />

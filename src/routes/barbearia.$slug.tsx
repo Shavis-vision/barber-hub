@@ -259,6 +259,7 @@ function PublicBooking() {
                   key={key}
                   onClick={() => { setDateKey(key); setSlot(null); }}
                   aria-pressed={active}
+                  aria-label={longDate(d)}
                   className={cn(
                     "flex h-[4.5rem] w-16 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary",

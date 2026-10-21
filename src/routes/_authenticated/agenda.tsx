@@ -147,7 +147,10 @@ function AgendaPage() {
                     {weekdayShort(day.getDay())}, {shortDate(day)}
                   </h2>
                   <span className="text-xs text-muted-foreground">
-                    {list.filter((a) => a.status !== "cancelled").length} agendamentos
+                    {(() => {
+                      const n = list.filter((a) => a.status !== "cancelled").length;
+                      return `${n} ${n === 1 ? "agendamento" : "agendamentos"}`;
+                    })()}
                   </span>
                 </header>
 

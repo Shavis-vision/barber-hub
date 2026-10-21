@@ -307,6 +307,7 @@ export function AppointmentDetailDialog({
   const [dateKey, setDateKey] = useState("");
   const [slot, setSlot] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [confirmCancelFor, setConfirmCancelFor] = useState<string | null>(null);
 
   const open = !!appointment;
 
@@ -320,6 +321,7 @@ export function AppointmentDetailDialog({
       return;
     }
     toast.success("Status atualizado.");
+    setConfirmCancelFor(null);
     refresh();
     onOpenChange(false);
   }
@@ -353,6 +355,7 @@ export function AppointmentDetailDialog({
         if (!next) {
           setRescheduling(false);
           setSlot(null);
+          setConfirmCancelFor(null);
         }
         onOpenChange(next);
       }}
@@ -466,11 +469,33 @@ export function AppointmentDetailDialog({
                     variant="ghost"
                     className="h-11 text-destructive hover:text-destructive"
                     disabled={busy}
-                    onClick={() => setStatus("cancelled")}
+                    onClick={() => setConfirmCancelFor(appointment.id)}
                   >
                     Cancelar
                   </Button>
                 </div>
+                {confirmCancelFor === appointment.id && (
+                  <div className="space-y-3 rounded-lg border border-destructive/40 px-3.5 py-3">
+                    <p className="text-sm">Cancelar este agendamento? O horário volta a ficar livre.</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button
+                        variant="outline"
+                        className="h-11"
+                        disabled={busy}
+                        onClick={() => setConfirmCancelFor(null)}
+                      >
+                        Voltar
+                      </Button>
+                      <Button
+                        className="h-11 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        disabled={busy}
+                        onClick={() => setStatus("cancelled")}
+                      >
+                        Sim, cancelar
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </>

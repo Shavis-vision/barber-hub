@@ -306,7 +306,8 @@ function DashboardPage() {
       </section>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        {(customers ?? []).length} clientes cadastrados na sua barbearia.
+        {(customers ?? []).length}{" "}
+        {(customers ?? []).length === 1 ? "cliente cadastrado" : "clientes cadastrados"} na sua barbearia.
       </p>
 
       {shop && (

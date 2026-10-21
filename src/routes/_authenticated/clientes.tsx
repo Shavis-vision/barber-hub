@@ -79,7 +79,7 @@ function CustomersPage() {
                     <p className="numeric truncate text-xs text-muted-foreground">{c.phone}</p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="numeric text-sm font-medium">{stat?.count ?? 0} atendimentos</p>
+                    <p className="numeric text-sm font-medium">{stat?.count ?? 0} {(stat?.count ?? 0) === 1 ? "atendimento" : "atendimentos"}</p>
                     <p className="numeric text-xs text-muted-foreground">
                       {stat?.last ? `Último em ${shortDate(new Date(stat.last))}` : "Sem histórico"}
                     </p>

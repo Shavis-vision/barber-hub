@@ -108,6 +108,10 @@ function ConfigPage() {
 
   async function saveShop() {
     if (!shop) return;
+    if (!name.trim()) {
+      toast.error("Informe o nome da barbearia.");
+      return;
+    }
     setSavingShop(true);
     const { error } = await supabase
       .from("barbershops")

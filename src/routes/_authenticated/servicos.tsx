@@ -152,6 +152,10 @@ function ServiceDialog({
       toast.error("Informe o nome do serviço.");
       return;
     }
+    if (price <= 0) {
+      toast.error("Informe um preço maior que zero.");
+      return;
+    }
     setSaving(true);
     const payload = {
       barbershop_id: shopId,

@@ -30,3 +30,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variáveis de ambiente locais (não commitar)
+.env
+.env.*
+!.env.example

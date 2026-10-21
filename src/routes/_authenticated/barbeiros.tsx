@@ -175,7 +175,7 @@ function BarbersPage() {
                     <span className="min-w-0">
                       <span className="block truncate text-sm font-medium">{b.name}</span>
                       <span className="block truncate text-xs text-muted-foreground">
-                        {b.phone ?? "Sem telefone"} · {count} serviços
+                        {b.phone ?? "Sem telefone"} · {count} {count === 1 ? "serviço" : "serviços"}
                         {!b.active && " · inativo"}
                       </span>
                     </span>

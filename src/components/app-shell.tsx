@@ -33,7 +33,8 @@ const NAV = [
   roles: readonly Role[];
 }>;
 
-const MOBILE_FOR_OWNER = ["/dashboard", "/agenda", "/clientes", "/servicos", "/configuracoes"];
+const MOBILE_FOR_OWNER = ["/dashboard", "/agenda", "/clientes", "/barbeiros", "/servicos", "/configuracoes"];
+const MOBILE_LABEL: Record<string, string> = { "/configuracoes": "Config." };
 const MOBILE_FOR_BARBER = ["/agenda", "/agendamentos", "/perfil"];
 
 export function AppShell({
@@ -144,7 +145,7 @@ export function AppShell({
               {({ isActive }) => (
                 <>
                   <Icon className={cn("size-5", isActive && "text-primary")} aria-hidden />
-                  <span className="truncate">{label}</span>
+                  <span className="truncate">{MOBILE_LABEL[to] ?? label}</span>
                 </>
               )}
             </Link>

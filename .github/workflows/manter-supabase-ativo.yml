@@ -2,6 +2,8 @@ name: Manter Supabase ativo
 
 # Faz uma leitura simples no banco a cada 3 dias, para o Supabase
 # (plano gratuito) não pausar o projeto por inatividade.
+# A URL e a chave pública (publishable) abaixo são só valores padrão: se existirem os segredos
+# SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY no GitHub, eles têm prioridade.
 on:
   schedule:
     - cron: "17 9 */3 * *"
@@ -13,8 +15,8 @@ jobs:
     steps:
       - name: Consultar o banco
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://lpzlgbwrowdyhbmvfuoq.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY || 'sb_publishable_at-SYD22iNdYPHOif0XuqA_HdXY0oUB' }}
         run: |
           status=$(curl -s -o /dev/null -w "%{http_code}" \
             "$SUPABASE_URL/rest/v1/barbershops?select=id&limit=1" \

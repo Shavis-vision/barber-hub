@@ -2,6 +2,7 @@ import { Link, useRouter } from "@tanstack/react-router";
 import {
   CalendarDays,
   CalendarRange,
+  History,
   LayoutDashboard,
   LogOut,
   Scissors,
@@ -21,6 +22,7 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["owner"] },
   { to: "/agenda", label: "Agenda", icon: CalendarRange, roles: ["owner", "barber"] },
   { to: "/agendamentos", label: "Agendamentos", icon: CalendarDays, roles: ["owner", "barber"] },
+  { to: "/alteracoes", label: "Alterações", icon: History, roles: ["owner"] },
   { to: "/clientes", label: "Clientes", icon: Users, roles: ["owner"] },
   { to: "/barbeiros", label: "Barbeiros", icon: UserRound, roles: ["owner"] },
   { to: "/servicos", label: "Serviços", icon: Scissors, roles: ["owner"] },

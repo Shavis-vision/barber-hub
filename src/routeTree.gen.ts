@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 import { Route as AuthenticatedAgendamentosRouteImport } from './routes/_authenticated/agendamentos'
+import { Route as AuthenticatedAlteracoesRouteImport } from './routes/_authenticated/alteracoes'
 import { Route as AuthenticatedBarbeirosRouteImport } from './routes/_authenticated/barbeiros'
 import { Route as AuthenticatedClienteRouteImport } from './routes/_authenticated/cliente'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
@@ -57,6 +58,11 @@ const AuthenticatedAgendamentosRoute =
     path: '/agendamentos',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAlteracoesRoute = AuthenticatedAlteracoesRouteImport.update({
+  id: '/alteracoes',
+  path: '/alteracoes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBarbeirosRoute = AuthenticatedBarbeirosRouteImport.update({
   id: '/barbeiros',
   path: '/barbeiros',
@@ -120,6 +126,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/alteracoes': typeof AuthenticatedAlteracoesRoute
   '/barbeiros': typeof AuthenticatedBarbeirosRoute
   '/cliente': typeof AuthenticatedClienteRoute
   '/clientes': typeof AuthenticatedClientesRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/alteracoes': typeof AuthenticatedAlteracoesRoute
   '/barbeiros': typeof AuthenticatedBarbeirosRoute
   '/cliente': typeof AuthenticatedClienteRoute
   '/clientes': typeof AuthenticatedClientesRoute
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/agendamentos': typeof AuthenticatedAgendamentosRoute
+  '/_authenticated/alteracoes': typeof AuthenticatedAlteracoesRoute
   '/_authenticated/barbeiros': typeof AuthenticatedBarbeirosRoute
   '/_authenticated/cliente': typeof AuthenticatedClienteRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
@@ -178,6 +187,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/agenda'
     | '/agendamentos'
+    | '/alteracoes'
     | '/barbeiros'
     | '/cliente'
     | '/clientes'
@@ -196,6 +206,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/agenda'
     | '/agendamentos'
+    | '/alteracoes'
     | '/barbeiros'
     | '/cliente'
     | '/clientes'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/agenda'
     | '/_authenticated/agendamentos'
+    | '/_authenticated/alteracoes'
     | '/_authenticated/barbeiros'
     | '/_authenticated/cliente'
     | '/_authenticated/clientes'
@@ -280,6 +292,13 @@ declare module '@tanstack/react-router' {
       path: '/agendamentos'
       fullPath: '/agendamentos'
       preLoaderRoute: typeof AuthenticatedAgendamentosRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/alteracoes': {
+      id: '/_authenticated/alteracoes'
+      path: '/alteracoes'
+      fullPath: '/alteracoes'
+      preLoaderRoute: typeof AuthenticatedAlteracoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/barbeiros': {
@@ -365,6 +384,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedAgendamentosRoute: typeof AuthenticatedAgendamentosRoute
+  AuthenticatedAlteracoesRoute: typeof AuthenticatedAlteracoesRoute
   AuthenticatedBarbeirosRoute: typeof AuthenticatedBarbeirosRoute
   AuthenticatedClienteRoute: typeof AuthenticatedClienteRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
@@ -378,6 +398,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedAgendamentosRoute: AuthenticatedAgendamentosRoute,
+  AuthenticatedAlteracoesRoute: AuthenticatedAlteracoesRoute,
   AuthenticatedBarbeirosRoute: AuthenticatedBarbeirosRoute,
   AuthenticatedClienteRoute: AuthenticatedClienteRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,

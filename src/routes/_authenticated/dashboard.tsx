@@ -201,6 +201,9 @@ function DashboardPage() {
         <Link to="/barbeiros" className="mt-3 inline-block text-sm text-primary">
           Ver resultado por barbeiro
         </Link>
+        <Link to="/alteracoes" className="mt-3 ml-4 inline-block text-sm text-primary">
+          Ver cancelamentos e remarcações
+        </Link>
 
         {lostItems.length > 0 && (
           <div className="mt-4 border-t border-border pt-3">

@@ -105,23 +105,19 @@ function ChangesPage() {
 
   const cancelled = all.filter((c) => c.kind === "cancelled");
   const rescheduled = all.filter((c) => c.kind === "rescheduled");
-  const byClient = all.filter((c) => c.actor === "client");
-  const lastMinute = all.filter((c) => c.actor === "client" && notice(c).late);
 
   return (
     <AppShell
       title="Alterações"
       description="Cancelamentos e remarcações — quem fez e com quanta antecedência"
     >
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3">
         <Stat
           label="Cancelamentos"
           value={cancelled.length}
           hint={money(cancelled.reduce((s, c) => s + c.price_cents, 0))}
         />
         <Stat label="Remarcações" value={rescheduled.length} />
-        <Stat label="Feitas por clientes" value={byClient.length} />
-        <Stat label="Clientes, última hora" value={lastMinute.length} hint="menos de 2 h antes" />
       </div>
 
       <Chips

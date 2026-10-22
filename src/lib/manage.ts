@@ -10,7 +10,9 @@ export function isActiveStatus(status: string) {
 }
 
 export function canChange(startsAt: string, status: string, now = Date.now()) {
-  return isActiveStatus(status) && new Date(startsAt).getTime() - now >= MIN_NOTICE_HOURS * 3600_000;
+  return (
+    isActiveStatus(status) && new Date(startsAt).getTime() - now >= MIN_NOTICE_HOURS * 3600_000
+  );
 }
 
 // As funções novas ainda não estão nos tipos gerados do Supabase.
@@ -61,4 +63,16 @@ export async function getManagedAppointment(token: string) {
 export function manageUrl(token: string) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   return `${origin}/agendamento/${token}`;
+}
+
+export type RescheduleSlot = { slot_at: string; barber_id: string };
+
+/** Horários livres para remarcar (mesmo serviço e barbeiro), sem contar o próprio agendamento. */
+export async function fetchRescheduleSlots(target: ManageTarget, dateKey: string) {
+  const { data, error } =
+    target.kind === "token"
+      ? await rpc("managed_available_slots", { p_token: target.token, p_date: dateKey })
+      : await rpc("my_available_slots", { p_id: target.id, p_date: dateKey });
+  if (error) throw new Error(error.message);
+  return (data ?? []) as RescheduleSlot[];
 }

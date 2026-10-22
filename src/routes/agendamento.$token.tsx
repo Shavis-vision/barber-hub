@@ -42,7 +42,10 @@ function ManagePage() {
             <Loader2 className="size-6 animate-spin text-muted-foreground" aria-hidden />
           </div>
         ) : q.isError ? (
-          <div role="alert" className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          <div
+            role="alert"
+            className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive"
+          >
             <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden />
             <span>Não foi possível carregar. Tente de novo em instantes.</span>
           </div>
@@ -50,13 +53,17 @@ function ManagePage() {
           <div className="panel p-8 text-center">
             <CalendarX className="mx-auto size-8 text-muted-foreground" aria-hidden />
             <h1 className="mt-3 text-xl font-semibold">Link não encontrado</h1>
-            <p className="mt-2 text-sm text-muted-foreground">Confira se o link foi copiado por inteiro, ou fale com a barbearia.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Confira se o link foi copiado por inteiro, ou fale com a barbearia.
+            </p>
           </div>
         ) : (
           <div className="panel overflow-hidden">
             <div className="flex items-center justify-between gap-3 p-5">
               <div className="min-w-0">
-                <h1 className="text-xl font-semibold tracking-tight">{longDate(new Date(a.starts_at))}</h1>
+                <h1 className="text-xl font-semibold tracking-tight">
+                  {longDate(new Date(a.starts_at))}
+                </h1>
                 <p className="numeric text-2xl font-semibold">{hhmm(a.starts_at)}</p>
               </div>
               <StatusBadge status={a.status} />

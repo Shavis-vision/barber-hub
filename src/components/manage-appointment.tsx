@@ -1,4 +1,4 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { CalendarClock, Loader2, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -13,13 +13,20 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { groupSlots, useAvailableSlots } from "@/lib/booking";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { groupSlots } from "@/lib/booking";
 import { addDays, hhmm, longDate, shortDate, toDateKey, weekdayShort } from "@/lib/format";
 import {
   MIN_NOTICE_HOURS,
   cancelAppointment,
   canChange,
+  fetchRescheduleSlots,
   isActiveStatus,
   rescheduleAppointment,
   type ManageTarget,
@@ -51,7 +58,9 @@ export function ManageActions(props: Props) {
     return (
       <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs text-muted-foreground">
         Cancelar ou remarcar só é possível com pelo menos {MIN_NOTICE_HOURS} horas de antecedência.
-        {shopPhone ? ` Para alterar agora, fale com a barbearia: ${shopPhone}.` : " Para alterar agora, fale com a barbearia."}
+        {shopPhone
+          ? ` Para alterar agora, fale com a barbearia: ${shopPhone}.`
+          : " Para alterar agora, fale com a barbearia."}
       </p>
     );
   }
@@ -78,7 +87,11 @@ export function ManageActions(props: Props) {
         <Button variant="outline" className="h-11 flex-1" onClick={() => setMoveOpen(true)}>
           <CalendarClock className="size-4" aria-hidden /> Remarcar
         </Button>
-        <Button variant="outline" className="h-11 flex-1 text-destructive hover:text-destructive" onClick={() => setCancelOpen(true)}>
+        <Button
+          variant="outline"
+          className="h-11 flex-1 text-destructive hover:text-destructive"
+          onClick={() => setCancelOpen(true)}
+        >
           <XCircle className="size-4" aria-hidden /> Cancelar
         </Button>
       </div>
@@ -88,7 +101,8 @@ export function ManageActions(props: Props) {
           <AlertDialogHeader>
             <AlertDialogTitle>Cancelar este horário?</AlertDialogTitle>
             <AlertDialogDescription>
-              {longDate(new Date(startsAt))} às {hhmm(startsAt)}. O horário volta a ficar livre para outros clientes.
+              {longDate(new Date(startsAt))} às {hhmm(startsAt)}. O horário volta a ficar livre para
+              outros clientes.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -113,9 +127,6 @@ export function ManageActions(props: Props) {
 
 function RescheduleDialog({
   target,
-  shopSlug,
-  serviceId,
-  barberId,
   startsAt,
   open,
   onOpenChange,
@@ -126,7 +137,13 @@ function RescheduleDialog({
   const [dateKey, setDateKey] = useState<string | null>(null);
   const [slot, setSlot] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const slots = useAvailableSlots(open ? shopSlug : undefined, serviceId, barberId, dateKey);
+  const targetKey = target.kind === "token" ? target.token : target.id;
+  const slots = useQuery({
+    queryKey: ["slots", "reschedule", targetKey, dateKey],
+    enabled: open && !!dateKey,
+    queryFn: () => fetchRescheduleSlots(target, dateKey!),
+    staleTime: 15_000,
+  });
   const grouped = groupSlots(slots.data ?? []);
 
   async function confirm() {
@@ -155,7 +172,8 @@ function RescheduleDialog({
         <DialogHeader>
           <DialogTitle>Remarcar horário</DialogTitle>
           <DialogDescription>
-            Atual: {longDate(new Date(startsAt))} às {hhmm(startsAt)}. Mesmo serviço e mesmo barbeiro.
+            Atual: {longDate(new Date(startsAt))} às {hhmm(startsAt)}. Mesmo serviço e mesmo
+            barbeiro.
           </DialogDescription>
         </DialogHeader>
 
@@ -175,13 +193,22 @@ function RescheduleDialog({
                 aria-label={longDate(d)}
                 className={cn(
                   "flex h-[4.5rem] w-16 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                  active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary",
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card hover:border-primary",
                 )}
               >
-                <span className={cn("text-[11px] uppercase tracking-wide", active ? "opacity-90" : "text-muted-foreground")}>
+                <span
+                  className={cn(
+                    "text-[11px] uppercase tracking-wide",
+                    active ? "opacity-90" : "text-muted-foreground",
+                  )}
+                >
                   {i === 0 ? "Hoje" : weekdayShort(d.getDay())}
                 </span>
-                <span className="numeric text-lg font-semibold leading-none">{shortDate(d).split("/")[0]}</span>
+                <span className="numeric text-lg font-semibold leading-none">
+                  {shortDate(d).split("/")[0]}
+                </span>
               </button>
             );
           })}
@@ -195,7 +222,9 @@ function RescheduleDialog({
               ))}
             </div>
           ) : slots.isError ? (
-            <p role="alert" className="text-sm text-destructive">Não foi possível carregar os horários.</p>
+            <p role="alert" className="text-sm text-destructive">
+              Não foi possível carregar os horários.
+            </p>
           ) : grouped.length === 0 ? (
             <p className="rounded-xl border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
               Nenhum horário livre neste dia. Escolha outra data.
@@ -212,7 +241,9 @@ function RescheduleDialog({
                     aria-pressed={active}
                     className={cn(
                       "numeric h-11 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-                      active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-card hover:border-primary",
                     )}
                   >
                     {hhmm(g.slotAt)}
@@ -223,7 +254,13 @@ function RescheduleDialog({
           ))}
 
         <Button className="h-12" disabled={!slot || busy} onClick={confirm}>
-          {busy ? <Loader2 className="size-4 animate-spin" aria-hidden /> : slot ? `Remarcar para ${hhmm(slot)}` : "Escolha data e horário"}
+          {busy ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+          ) : slot ? (
+            `Remarcar para ${hhmm(slot)}`
+          ) : (
+            "Escolha data e horário"
+          )}
         </Button>
       </DialogContent>
     </Dialog>

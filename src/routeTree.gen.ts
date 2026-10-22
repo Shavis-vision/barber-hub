@@ -23,6 +23,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedServicosRouteImport } from './routes/_authenticated/servicos'
+import { Route as AgendamentoTokenRouteImport } from './routes/agendamento.$token'
 import { Route as BarbeariaSlugRouteImport } from './routes/barbearia.$slug'
 import { Route as ConviteCodeRouteImport } from './routes/convite.$code'
 
@@ -97,6 +98,11 @@ const AuthenticatedServicosRoute = AuthenticatedServicosRouteImport.update({
   path: '/servicos',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AgendamentoTokenRoute = AgendamentoTokenRouteImport.update({
+  id: '/agendamento/$token',
+  path: '/agendamento/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BarbeariaSlugRoute = BarbeariaSlugRouteImport.update({
   id: '/barbearia/$slug',
   path: '/barbearia/$slug',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/inicio': typeof AuthenticatedInicioRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/servicos': typeof AuthenticatedServicosRoute
+  '/agendamento/$token': typeof AgendamentoTokenRoute
   '/barbearia/$slug': typeof BarbeariaSlugRoute
   '/convite/$code': typeof ConviteCodeRoute
 }
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/inicio': typeof AuthenticatedInicioRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/servicos': typeof AuthenticatedServicosRoute
+  '/agendamento/$token': typeof AgendamentoTokenRoute
   '/barbearia/$slug': typeof BarbeariaSlugRoute
   '/convite/$code': typeof ConviteCodeRoute
 }
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/servicos': typeof AuthenticatedServicosRoute
+  '/agendamento/$token': typeof AgendamentoTokenRoute
   '/barbearia/$slug': typeof BarbeariaSlugRoute
   '/convite/$code': typeof ConviteCodeRoute
 }
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/perfil'
     | '/servicos'
+    | '/agendamento/$token'
     | '/barbearia/$slug'
     | '/convite/$code'
   fileRoutesByTo: FileRoutesByTo
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/inicio'
     | '/perfil'
     | '/servicos'
+    | '/agendamento/$token'
     | '/barbearia/$slug'
     | '/convite/$code'
   id:
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inicio'
     | '/_authenticated/perfil'
     | '/_authenticated/servicos'
+    | '/agendamento/$token'
     | '/barbearia/$slug'
     | '/convite/$code'
   fileRoutesById: FileRoutesById
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  AgendamentoTokenRoute: typeof AgendamentoTokenRoute
   BarbeariaSlugRoute: typeof BarbeariaSlugRoute
   ConviteCodeRoute: typeof ConviteCodeRoute
 }
@@ -325,6 +338,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedServicosRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/agendamento/$token': {
+      id: '/agendamento/$token'
+      path: '/agendamento/$token'
+      fullPath: '/agendamento/$token'
+      preLoaderRoute: typeof AgendamentoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/barbearia/$slug': {
       id: '/barbearia/$slug'
       path: '/barbearia/$slug'
@@ -376,6 +396,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  AgendamentoTokenRoute: AgendamentoTokenRoute,
   BarbeariaSlugRoute: BarbeariaSlugRoute,
   ConviteCodeRoute: ConviteCodeRoute,
 }

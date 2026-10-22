@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { AlertCircle, CalendarX, Check, Clock, Loader2, MapPin, Scissors, Users } from "lucide-react";
+import { AlertCircle, CalendarX, Check, Clock, Copy, Link2, Loader2, MapPin, Scissors, Users } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchSlots, groupSlots, useAvailableSlots } from "@/lib/booking";
 import { addDays, fromDateKey, hhmm, longDate, maskPhone, money, shortDate, toDateKey, weekdayShort } from "@/lib/format";
+import { manageUrl } from "@/lib/manage";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/barbearia/$slug")({
@@ -67,7 +68,7 @@ function PublicBooking() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [saving, setSaving] = useState(false);
-  const [done, setDone] = useState<{ starts_at: string; barber_id: string } | null>(null);
+  const [done, setDone] = useState<{ starts_at: string; barber_id: string; manage_token?: string } | null>(null);
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
@@ -144,7 +145,7 @@ function PublicBooking() {
       return;
     }
     queryClient.invalidateQueries({ queryKey: ["my-appointments"] });
-    setDone(result as { starts_at: string; barber_id: string });
+    setDone(result as { starts_at: string; barber_id: string; manage_token?: string });
   }
 
   const periods = [
@@ -171,6 +172,43 @@ function PublicBooking() {
             <SummaryRow label="Horário" value={hhmm(done.starts_at)} />
             {service && <SummaryRow label="Valor" value={money(service.price_cents)} />}
           </dl>
+          {done.manage_token && (
+            <div className="border-t border-border p-4">
+              <p className="flex items-center gap-2 text-sm font-medium">
+                <Link2 className="size-4" aria-hidden /> Guarde o link do seu agendamento
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                É por ele que você cancela ou remarca, sem precisar de conta (até 2 horas antes do horário).
+              </p>
+              <div className="mt-3 flex gap-2">
+                <Button
+                  variant="outline"
+                  className="h-11 flex-1"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText(manageUrl(done.manage_token!));
+                      toast.success("Link copiado.");
+                    } catch {
+                      toast.error("Não foi possível copiar. Use o botão ao lado.");
+                    }
+                  }}
+                >
+                  <Copy className="size-4" aria-hidden /> Copiar link
+                </Button>
+                <a
+                  className="flex-1"
+                  href={`https://wa.me/?text=${encodeURIComponent(`Meu horário na ${data.shop.name}: ${manageUrl(done.manage_token)}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" className="h-11 w-full">Enviar no WhatsApp</Button>
+                </a>
+              </div>
+              <Link to="/agendamento/$token" params={{ token: done.manage_token }} className="mt-2 block">
+                <Button variant="ghost" className="h-11 w-full">Abrir meu agendamento</Button>
+              </Link>
+            </div>
+          )}
           <div className="border-t border-border p-4">
             <Link to={signedIn ? "/cliente" : "/auth"} className="block">
               <Button variant="outline" className="h-12 w-full">

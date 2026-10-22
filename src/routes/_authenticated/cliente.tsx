@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { CalendarPlus, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { ManageActions } from "@/components/manage-appointment";
 import { RoleGate } from "@/components/role-gate";
 import { StatusBadge } from "@/components/status-badge";
 import { Button } from "@/components/ui/button";
@@ -31,9 +32,11 @@ type MyAppointment = {
   starts_at: string;
   status: string;
   price_cents: number;
+  service_id: string;
+  barber_id: string;
   services: { name: string } | null;
   barbers: { name: string } | null;
-  barbershops: { name: string; slug: string } | null;
+  barbershops: { name: string; slug: string; phone: string | null } | null;
 };
 
 function useMyAppointments() {
@@ -45,7 +48,7 @@ function useMyAppointments() {
       // RLS só devolve agendamentos feitos por esta conta.
       const { data, error } = await supabase
         .from("appointments")
-        .select("id, starts_at, status, price_cents, services(name), barbers(name), barbershops(name, slug)")
+        .select("id, starts_at, status, price_cents, service_id, barber_id, services(name), barbers(name), barbershops(name, slug, phone)")
         .eq("booked_by" as never, u.user.id)
         .order("starts_at", { ascending: false });
       if (error) throw error;
@@ -86,7 +89,7 @@ function ClientPage() {
 
         <NewBooking lastShop={lastShop} />
 
-        <Section title="Próximos" items={upcoming} loading={isLoading} empty="Nenhum horário marcado." />
+        <Section title="Próximos" items={upcoming} loading={isLoading} empty="Nenhum horário marcado." manage />
         {past.length > 0 && <Section title="Anteriores" items={past} />}
       </main>
     </div>
@@ -189,12 +192,15 @@ function Section({
   items,
   loading,
   empty,
+  manage,
 }: {
   title: string;
   items: MyAppointment[];
   loading?: boolean;
   empty?: string;
+  manage?: boolean;
 }) {
+  const queryClient = useQueryClient();
   return (
     <section className="mt-6">
       <p className="label-caps">{title}</p>
@@ -206,7 +212,8 @@ function Section({
         ) : (
           <ul className="divide-y divide-border">
             {items.map((a) => (
-              <li key={a.id} className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3.5">
+              <li key={a.id} className="px-4 py-3.5">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
                 <span className="w-16">
                   <span className="numeric block text-sm font-semibold">{shortDate(new Date(a.starts_at))}</span>
                   <span className="numeric block text-xs text-muted-foreground">{hhmm(a.starts_at)}</span>
@@ -218,6 +225,21 @@ function Section({
                   </span>
                 </span>
                 <StatusBadge status={a.status} />
+                </div>
+                {manage && a.barbershops && (
+                  <div className="mt-3">
+                    <ManageActions
+                      target={{ kind: "mine", id: a.id }}
+                      shopSlug={a.barbershops.slug}
+                      serviceId={a.service_id}
+                      barberId={a.barber_id}
+                      startsAt={a.starts_at}
+                      status={a.status}
+                      shopPhone={a.barbershops.phone}
+                      onChanged={() => queryClient.invalidateQueries({ queryKey: ["my-appointments"] })}
+                    />
+                  </div>
+                )}
               </li>
             ))}
           </ul>

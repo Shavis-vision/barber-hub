@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/agendamentos")({
   head: () => ({
     meta: [
-      { title: "Agendamentos — Cortezy" },
+      { title: "Agendamentos — Cortesy" },
       {
         name: "description",
         content: "Lista de agendamentos da barbearia com filtro por status e ações rápidas.",
       },
-      { property: "og:title", content: "Agendamentos — Cortezy" },
+      { property: "og:title", content: "Agendamentos — Cortesy" },
       { property: "og:description", content: "Todos os agendamentos da sua barbearia." },
     ],
   }),

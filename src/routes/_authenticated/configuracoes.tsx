@@ -26,13 +26,13 @@ function normalizeSlug(value: string) {
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({
     meta: [
-      { title: "Configurações — Cortezy" },
+      { title: "Configurações — Cortesy" },
       {
         name: "description",
         content:
           "Dados da barbearia, endereço público de agendamento e horários de funcionamento por dia da semana.",
       },
-      { property: "og:title", content: "Configurações — Cortezy" },
+      { property: "og:title", content: "Configurações — Cortesy" },
       {
         property: "og:description",
         content: "Dados da barbearia e horários de funcionamento.",

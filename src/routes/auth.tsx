@@ -10,13 +10,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Entrar — Cortezy" },
+      { title: "Entrar — Cortesy" },
       {
         name: "description",
         content:
           "Acesse o painel da sua barbearia ou crie sua conta gratuita para começar a receber agendamentos online.",
       },
-      { property: "og:title", content: "Entrar — Cortezy" },
+      { property: "og:title", content: "Entrar — Cortesy" },
       {
         property: "og:description",
         content: "Acesse o painel da sua barbearia ou crie sua conta gratuita.",
@@ -112,7 +112,7 @@ function AuthPage() {
   return (
     <Centered>
       <Link to="/" className="label-caps">
-        Cortezy
+        Cortesy
       </Link>
       <h1 className="mt-3 text-2xl font-semibold">
         {mode === "login" && "Entrar no painel"}

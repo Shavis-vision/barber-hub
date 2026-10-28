@@ -10,7 +10,7 @@ import { getManagedAppointment } from "@/lib/manage";
 export const Route = createFileRoute("/agendamento/$token")({
   head: () => ({
     meta: [
-      { title: "Meu agendamento | Cortezy" },
+      { title: "Meu agendamento | Cortesy" },
       { name: "description", content: "Veja, remarque ou cancele o seu horário." },
       { name: "robots", content: "noindex" },
     ],
@@ -32,7 +32,7 @@ function ManagePage() {
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border bg-background">
         <div className="mx-auto max-w-xl px-4 py-5">
-          <p className="text-lg font-semibold">{a?.found ? a.shop_name : "Cortezy"}</p>
+          <p className="text-lg font-semibold">{a?.found ? a.shop_name : "Cortesy"}</p>
           <p className="text-sm text-muted-foreground">Seu agendamento</p>
         </div>
       </header>

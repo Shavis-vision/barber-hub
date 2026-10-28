@@ -22,12 +22,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/agenda")({
   head: () => ({
     meta: [
-      { title: "Agenda — Cortezy" },
+      { title: "Agenda — Cortesy" },
       {
         name: "description",
         content: "Agenda visual da barbearia por dia e por semana, com horário, cliente e barbeiro.",
       },
-      { property: "og:title", content: "Agenda — Cortezy" },
+      { property: "og:title", content: "Agenda — Cortesy" },
       { property: "og:description", content: "Agenda da barbearia por dia e por semana." },
     ],
   }),

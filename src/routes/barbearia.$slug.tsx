@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/barbearia/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `Agendar horário — ${params.slug} | Cortezy` },
+      { title: `Agendar horário — ${params.slug} | Cortesy` },
       { name: "description", content: "Escolha serviço, barbeiro e horário disponível e agende em poucos passos." },
       { property: "og:title", content: `Agendar horário — ${params.slug}` },
       { property: "og:description", content: "Agende seu horário online em poucos passos." },
@@ -435,13 +435,13 @@ function Shell({ shop, servicesCount, children }: { shop?: Shop; servicesCount?:
               </div>
             </div>
           ) : (
-            <p className="text-lg font-semibold">Cortezy</p>
+            <p className="text-lg font-semibold">Cortesy</p>
           )}
           {shop && <p className="mt-4 text-sm text-muted-foreground">Agende seu horário online em poucos passos.</p>}
         </div>
       </header>
       <main className="mx-auto max-w-xl px-4 pb-16 pt-2">{children}</main>
-      <footer className="pb-8 text-center text-xs text-muted-foreground">Agendamento por Cortezy</footer>
+      <footer className="pb-8 text-center text-xs text-muted-foreground">Agendamento por Cortesy</footer>
     </div>
   );
 }

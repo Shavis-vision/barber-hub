@@ -5,15 +5,15 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
-const PENDING_KEY = "cortezy:pending-invite";
+const PENDING_KEY = "cortesy:pending-invite";
 
 export const Route = createFileRoute("/convite/$code")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Convite de barbeiro — Cortezy" },
-      { name: "description", content: "Aceite o convite para acessar sua agenda no Cortezy." },
-      { property: "og:title", content: "Convite de barbeiro — Cortezy" },
+      { title: "Convite de barbeiro — Cortesy" },
+      { name: "description", content: "Aceite o convite para acessar sua agenda no Cortesy." },
+      { property: "og:title", content: "Convite de barbeiro — Cortesy" },
       { property: "og:description", content: "Ligue sua conta ao cadastro de barbeiro." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -81,7 +81,7 @@ function InvitePage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-surface px-4">
       <div className="panel w-full max-w-sm p-6">
-        <p className="font-display text-lg font-semibold">Cortezy</p>
+        <p className="font-display text-lg font-semibold">Cortesy</p>
         <h1 className="mt-4 text-xl font-semibold">Convite de barbeiro</h1>
 
         {session.isLoading || (user && info.isLoading) ? (

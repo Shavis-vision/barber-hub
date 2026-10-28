@@ -11,7 +11,7 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/alteracoes")({
   head: () => ({
     meta: [
-      { title: "Alterações — Navalha" },
+      { title: "Alterações — Cortezy" },
       {
         name: "description",
         content: "Cancelamentos e remarcações, com quem fez e com quanta antecedência.",

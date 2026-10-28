@@ -24,12 +24,12 @@ import { money, parseMoney } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/servicos")({
   head: () => ({
     meta: [
-      { title: "Serviços — Navalha" },
+      { title: "Serviços — Cortezy" },
       {
         name: "description",
         content: "Cadastro de serviços da barbearia com preço, duração e status.",
       },
-      { property: "og:title", content: "Serviços — Navalha" },
+      { property: "og:title", content: "Serviços — Cortezy" },
       { property: "og:description", content: "Serviços oferecidos pela sua barbearia." },
     ],
   }),

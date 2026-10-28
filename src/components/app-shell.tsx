@@ -71,7 +71,7 @@ export function AppShell({
     <div className="min-h-screen bg-surface">
       <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col border-r border-border bg-sidebar px-3 py-5 lg:flex">
         <div className="px-3 pb-6">
-          <p className="font-display text-lg font-semibold tracking-tight">Navalha</p>
+          <p className="font-display text-lg font-semibold tracking-tight">Cortezy</p>
           <p className="mt-0.5 truncate text-xs text-muted-foreground">
             {shop?.name ?? "Carregando…"}
           </p>

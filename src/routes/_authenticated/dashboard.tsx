@@ -21,12 +21,12 @@ import { addDays, hhmm, longDate, money, shortDate, startOfWeek } from "@/lib/fo
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Navalha" },
+      { title: "Dashboard — Cortezy" },
       {
         name: "description",
         content: "Visão geral do dia: agendamentos, clientes, barbeiros e faturamento.",
       },
-      { property: "og:title", content: "Dashboard — Navalha" },
+      { property: "og:title", content: "Dashboard — Cortezy" },
       { property: "og:description", content: "Visão geral do dia da sua barbearia." },
     ],
   }),

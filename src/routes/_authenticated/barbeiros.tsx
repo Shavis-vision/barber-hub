@@ -32,12 +32,12 @@ import { addDays, maskPhone, money, startOfWeek } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/barbeiros")({
   head: () => ({
     meta: [
-      { title: "Barbeiros — Navalha" },
+      { title: "Barbeiros — Cortezy" },
       {
         name: "description",
         content: "Equipe da barbearia: dados de contato, serviços realizados e status.",
       },
-      { property: "og:title", content: "Barbeiros — Navalha" },
+      { property: "og:title", content: "Barbeiros — Cortezy" },
       { property: "og:description", content: "Equipe da sua barbearia." },
     ],
   }),

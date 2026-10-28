@@ -14,9 +14,9 @@ import { hhmm, money, shortDate } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/cliente")({
   head: () => ({
     meta: [
-      { title: "Meus agendamentos — Navalha" },
+      { title: "Meus agendamentos — Cortezy" },
       { name: "description", content: "Veja seus horários marcados e faça um novo agendamento." },
-      { property: "og:title", content: "Meus agendamentos — Navalha" },
+      { property: "og:title", content: "Meus agendamentos — Cortezy" },
       { property: "og:description", content: "Seus horários marcados nas barbearias." },
     ],
   }),
@@ -77,7 +77,7 @@ function ClientPage() {
     <div className="min-h-screen bg-surface">
       <header className="border-b border-border bg-background">
         <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-          <p className="font-display text-lg font-semibold tracking-tight">Navalha</p>
+          <p className="font-display text-lg font-semibold tracking-tight">Cortezy</p>
           <Button variant="ghost" className="h-11" onClick={signOut}>
             <LogOut className="size-4" aria-hidden /> Sair
           </Button>

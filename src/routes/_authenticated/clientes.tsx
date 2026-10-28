@@ -9,12 +9,12 @@ import { shortDate } from "@/lib/format";
 export const Route = createFileRoute("/_authenticated/clientes")({
   head: () => ({
     meta: [
-      { title: "Clientes — Navalha" },
+      { title: "Clientes — Cortezy" },
       {
         name: "description",
         content: "Clientes da barbearia com telefone, último atendimento e total de atendimentos.",
       },
-      { property: "og:title", content: "Clientes — Navalha" },
+      { property: "og:title", content: "Clientes — Cortezy" },
       { property: "og:description", content: "Base de clientes da sua barbearia." },
     ],
   }),

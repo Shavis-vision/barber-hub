@@ -11,12 +11,12 @@ import { useAccessProfile } from "@/lib/roles";
 export const Route = createFileRoute("/_authenticated/perfil")({
   head: () => ({
     meta: [
-      { title: "Meu perfil — Navalha" },
+      { title: "Meu perfil — Cortezy" },
       {
         name: "description",
         content: "Seus dados de barbeiro e os serviços que você realiza na barbearia.",
       },
-      { property: "og:title", content: "Meu perfil — Navalha" },
+      { property: "og:title", content: "Meu perfil — Cortezy" },
       { property: "og:description", content: "Seus dados e serviços como barbeiro." },
     ],
   }),

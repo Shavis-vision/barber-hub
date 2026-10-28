@@ -4,10 +4,10 @@ import { homeForRole, useAccessProfile } from "@/lib/roles";
 export const Route = createFileRoute("/_authenticated/inicio")({
   head: () => ({
     meta: [
-      { title: "Entrando — Navalha" },
-      { name: "description", content: "Direcionando para a sua área no Navalha." },
-      { property: "og:title", content: "Entrando — Navalha" },
-      { property: "og:description", content: "Direcionando para a sua área no Navalha." },
+      { title: "Entrando — Cortezy" },
+      { name: "description", content: "Direcionando para a sua área no Cortezy." },
+      { property: "og:title", content: "Entrando — Cortezy" },
+      { property: "og:description", content: "Direcionando para a sua área no Cortezy." },
     ],
   }),
   component: StartPage,
@@ -24,7 +24,7 @@ function StartPage() {
     );
   }
   const pendingInvite =
-    typeof window !== "undefined" ? sessionStorage.getItem("navalha:pending-invite") : null;
+    typeof window !== "undefined" ? sessionStorage.getItem("cortezy:pending-invite") : null;
   if (pendingInvite && /^[a-f0-9]{64}$/.test(pendingInvite)) {
     return <Navigate to="/convite/$code" params={{ code: pendingInvite }} replace />;
   }

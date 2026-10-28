@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Navalha — Agendamento online para barbearias" },
+      { title: "Cortezy — Agendamento online para barbearias" },
       {
         name: "description",
         content:
           "Sua barbearia com agenda organizada e página de agendamento própria. Cadastre serviços, barbeiros e horários em minutos.",
       },
-      { property: "og:title", content: "Navalha — Agendamento online para barbearias" },
+      { property: "og:title", content: "Cortezy — Agendamento online para barbearias" },
       {
         property: "og:description",
         content: "Agenda organizada e página de agendamento própria para sua barbearia.",
@@ -25,7 +25,7 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background">
       <header className="mx-auto flex max-w-4xl items-center justify-between px-5 py-5">
-        <span className="font-display text-lg font-semibold tracking-tight">Navalha</span>
+        <span className="font-display text-lg font-semibold tracking-tight">Cortezy</span>
         <Link to="/auth">
           <Button variant="ghost" className="h-10">
             Entrar
@@ -77,7 +77,7 @@ function Landing() {
         </section>
 
         <footer className="py-12 text-sm text-muted-foreground">
-          Navalha — plataforma de agendamento para barbearias.
+          Cortezy — plataforma de agendamento para barbearias.
         </footer>
       </main>
     </div>

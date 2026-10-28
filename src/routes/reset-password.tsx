@@ -9,9 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Nova senha — Navalha" },
+      { title: "Nova senha — Cortezy" },
       { name: "description", content: "Defina uma nova senha para acessar o painel da barbearia." },
-      { property: "og:title", content: "Nova senha — Navalha" },
+      { property: "og:title", content: "Nova senha — Cortezy" },
       { property: "og:description", content: "Defina uma nova senha de acesso." },
     ],
   }),

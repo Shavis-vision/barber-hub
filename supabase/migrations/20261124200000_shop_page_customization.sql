@@ -43,7 +43,7 @@ CREATE POLICY shop_media_owner_select ON storage.objects
     bucket_id = 'shop-media'
     AND EXISTS (
       SELECT 1 FROM public.barbershops b
-      WHERE b.id::text = (storage.foldername(name))[1] AND b.owner_id = auth.uid()
+      WHERE b.id::text = (storage.foldername(storage.objects.name))[1] AND b.owner_id = auth.uid()
     )
   );
 
@@ -53,7 +53,7 @@ CREATE POLICY shop_media_owner_insert ON storage.objects
     bucket_id = 'shop-media'
     AND EXISTS (
       SELECT 1 FROM public.barbershops b
-      WHERE b.id::text = (storage.foldername(name))[1] AND b.owner_id = auth.uid()
+      WHERE b.id::text = (storage.foldername(storage.objects.name))[1] AND b.owner_id = auth.uid()
     )
   );
 
@@ -63,6 +63,6 @@ CREATE POLICY shop_media_owner_delete ON storage.objects
     bucket_id = 'shop-media'
     AND EXISTS (
       SELECT 1 FROM public.barbershops b
-      WHERE b.id::text = (storage.foldername(name))[1] AND b.owner_id = auth.uid()
+      WHERE b.id::text = (storage.foldername(storage.objects.name))[1] AND b.owner_id = auth.uid()
     )
   );

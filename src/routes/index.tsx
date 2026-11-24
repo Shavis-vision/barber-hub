@@ -69,18 +69,18 @@ function Landing() {
           {[
             {
               icon: QrCode,
-              title: "O cliente marca sem baixar nada",
-              text: "Pelo link no Instagram ou pelo QR code no balcão. Escolhe serviço, barbeiro e horário e deixa só nome e WhatsApp.",
+              title: "Agendamento mais fácil",
+              text: "Seu cliente marca pelo link ou QR code, sem baixar aplicativo.",
             },
             {
               icon: RefreshCw,
               title: "Remarcação sem ligação",
-              text: "O próprio cliente cancela ou troca o horário pelo link que recebeu, até 2 horas antes. Você vê quem mudou e com quanta antecedência.",
+              text: "O cliente cancela ou troca o horário sozinho, até 2 horas antes.",
             },
             {
               icon: Wallet,
-              title: "Quanto cada barbeiro rendeu",
-              text: "Faturamento do dia, da semana e do mês, faltas e a comissão de cada barbeiro, calculada sozinha.",
+              title: "Comissão sem planilha",
+              text: "Veja quanto cada barbeiro rendeu e quanto pagar a ele.",
             },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="bg-card p-6">

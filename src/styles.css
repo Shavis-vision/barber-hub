@@ -162,6 +162,11 @@
   h3,
   h4 {
     font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Estreita (cara de letreiro) só nos títulos grandes; nos pequenos fica legível */
+  h1 {
     font-stretch: 85%;
     letter-spacing: -0.02em;
   }

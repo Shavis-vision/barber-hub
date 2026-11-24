@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CalendarCheck, Clock, Copy, Mail, ShieldCheck } from "lucide-react";
+import { Copy, Mail, QrCode, RefreshCw, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -68,24 +68,24 @@ function Landing() {
         <section className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
           {[
             {
-              icon: CalendarCheck,
-              title: "Agenda por dia e semana",
-              text: "Veja horário, cliente, serviço e barbeiro sem poluição visual.",
+              icon: QrCode,
+              title: "O cliente marca sem baixar nada",
+              text: "Pelo link no Instagram ou pelo QR code no balcão. Escolhe serviço, barbeiro e horário e deixa só nome e WhatsApp.",
             },
             {
-              icon: Clock,
-              title: "Horários reais",
-              text: "Só aparece o que está livre, considerando duração e turnos.",
+              icon: RefreshCw,
+              title: "Remarcação sem ligação",
+              text: "O próprio cliente cancela ou troca o horário pelo link que recebeu, até 2 horas antes. Você vê quem mudou e com quanta antecedência.",
             },
             {
-              icon: ShieldCheck,
-              title: "Sem horário duplicado",
-              text: "Dois clientes nunca reservam o mesmo horário com o mesmo barbeiro.",
+              icon: Wallet,
+              title: "Quanto cada barbeiro rendeu",
+              text: "Faturamento do dia, da semana e do mês, faltas e a comissão de cada barbeiro, calculada sozinha.",
             },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="bg-card p-6">
               <Icon className="size-5 text-primary" aria-hidden />
-              <h2 className="mt-4 text-base font-semibold">{title}</h2>
+              <h2 className="mt-4 text-[17px] leading-snug font-semibold">{title}</h2>
               <p className="mt-1.5 text-sm text-muted-foreground">{text}</p>
             </div>
           ))}

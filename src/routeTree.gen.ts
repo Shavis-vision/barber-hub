@@ -22,6 +22,7 @@ import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedPaginaRouteImport } from './routes/_authenticated/pagina'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedServicosRouteImport } from './routes/_authenticated/servicos'
 import { Route as AgendamentoTokenRouteImport } from './routes/agendamento.$token'
@@ -94,6 +95,11 @@ const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPaginaRoute = AuthenticatedPaginaRouteImport.update({
+  id: '/pagina',
+  path: '/pagina',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -133,6 +139,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/pagina': typeof AuthenticatedPaginaRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/servicos': typeof AuthenticatedServicosRoute
   '/agendamento/$token': typeof AgendamentoTokenRoute
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/inicio': typeof AuthenticatedInicioRoute
+  '/pagina': typeof AuthenticatedPaginaRoute
   '/perfil': typeof AuthenticatedPerfilRoute
   '/servicos': typeof AuthenticatedServicosRoute
   '/agendamento/$token': typeof AgendamentoTokenRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
+  '/_authenticated/pagina': typeof AuthenticatedPaginaRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
   '/_authenticated/servicos': typeof AuthenticatedServicosRoute
   '/agendamento/$token': typeof AgendamentoTokenRoute
@@ -194,6 +203,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/inicio'
+    | '/pagina'
     | '/perfil'
     | '/servicos'
     | '/agendamento/$token'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/inicio'
+    | '/pagina'
     | '/perfil'
     | '/servicos'
     | '/agendamento/$token'
@@ -233,6 +244,7 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/inicio'
+    | '/_authenticated/pagina'
     | '/_authenticated/perfil'
     | '/_authenticated/servicos'
     | '/agendamento/$token'
@@ -343,6 +355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/pagina': {
+      id: '/_authenticated/pagina'
+      path: '/pagina'
+      fullPath: '/pagina'
+      preLoaderRoute: typeof AuthenticatedPaginaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -391,6 +410,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
+  AuthenticatedPaginaRoute: typeof AuthenticatedPaginaRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
   AuthenticatedServicosRoute: typeof AuthenticatedServicosRoute
 }
@@ -405,6 +425,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
+  AuthenticatedPaginaRoute: AuthenticatedPaginaRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
   AuthenticatedServicosRoute: AuthenticatedServicosRoute,
 }

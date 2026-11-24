@@ -316,10 +316,15 @@ export type Database = {
       barbershops: {
         Row: {
           address: string | null
+          banner_url: string | null
           created_at: string
           id: string
+          logo_url: string | null
           name: string
           owner_id: string
+          page_banner: string
+          page_icon: string
+          page_icon_color: string
           phone: string | null
           slot_step_minutes: number
           slug: string
@@ -327,10 +332,15 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          banner_url?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           name: string
           owner_id: string
+          page_banner?: string
+          page_icon?: string
+          page_icon_color?: string
           phone?: string | null
           slot_step_minutes?: number
           slug: string
@@ -338,10 +348,15 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          banner_url?: string | null
           created_at?: string
           id?: string
+          logo_url?: string | null
           name?: string
           owner_id?: string
+          page_banner?: string
+          page_icon?: string
+          page_icon_color?: string
           phone?: string | null
           slot_step_minutes?: number
           slug?: string

@@ -10,6 +10,11 @@ export type Barbershop = {
   address: string | null;
   timezone: string;
   slot_step_minutes: number;
+  page_icon: string;
+  page_icon_color: string;
+  page_banner: string;
+  logo_url: string | null;
+  banner_url: string | null;
 };
 
 export type Service = {

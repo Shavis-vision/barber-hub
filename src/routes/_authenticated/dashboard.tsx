@@ -17,16 +17,18 @@ import {
   type AppointmentRow,
 } from "@/lib/shop";
 import { addDays, hhmm, longDate, money, shortDate, startOfWeek } from "@/lib/format";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — Cortesy" },
+      { title: "Início — Cortesy" },
       {
         name: "description",
         content: "Visão geral do dia: agendamentos, clientes, barbeiros e faturamento.",
       },
-      { property: "og:title", content: "Dashboard — Cortesy" },
+      { property: "og:title", content: "Início — Cortesy" },
       { property: "og:description", content: "Visão geral do dia da sua barbearia." },
     ],
   }),
@@ -129,33 +131,142 @@ function DashboardPage() {
     ...lostList.map((appointment) => ({ kind: "lost" as const, at: appointment.starts_at, appointment })),
     ...postponed.map((reschedule) => ({ kind: "postponed" as const, at: reschedule.from_starts_at, reschedule })),
   ].sort((a, b) => a.at.localeCompare(b.at));
-  const clientsToday = new Set(active.map((a) => a.customer_id)).size;
+  const todayActive = [...active].sort((x, y) => x.starts_at.localeCompare(y.starts_at));
+  const todayDone = todayActive.filter((a) => a.status === "completed");
+  const todayExpected = sumCents(todayActive.filter((a) => a.status !== "no_show"));
+  const next = (upcoming ?? []).find((a) => a.status === "confirmed" || a.status === "pending");
+  const nextPhone = next?.customers?.phone?.replace(/\D/g, "");
 
   return (
     <AppShell
-      title="Dashboard"
+      title="Início"
       description={longDate(new Date())}
       action={
         shop && (
           <Button className="h-11 px-4" onClick={() => setCreating(true)}>
             <Plus className="size-4" aria-hidden />
-            <span className="hidden sm:inline">Novo agendamento</span>
+            Agendar
           </Button>
         )
       }
     >
-      <section className="grid grid-cols-3 gap-3">
-        <Stat label="Agendamentos hoje" value={String(active.length)} />
-        <Stat label="Clientes do dia" value={String(clientsToday)} />
+      <section className="rounded-3xl bg-hero p-5 text-white" aria-label="Próximo cliente">
+        {next ? (
+          <>
+            <p className="text-sm text-white/85">Próximo cliente · {whenLabel(next.starts_at)}</p>
+            <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+              <span className="display-num text-[56px] leading-none font-bold">{hhmm(next.starts_at)}</span>
+              <div className="min-w-0">
+                <p className="truncate text-lg leading-snug font-semibold">
+                  {next.customer_name ?? next.customers?.name}
+                </p>
+                <p className="truncate text-sm text-white/85">
+                  {next.services?.name} · {next.barbers?.name}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 flex gap-2">
+              <button
+                onClick={() => setSelected(next)}
+                className="press h-11 flex-1 rounded-xl bg-white text-sm font-semibold text-[#12485a]"
+              >
+                Ver agendamento
+              </button>
+              {nextPhone && nextPhone.length >= 10 && (
+                <a
+                  href={`https://wa.me/55${nextPhone}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="press flex h-11 flex-1 items-center justify-center rounded-xl border border-white/45 text-sm font-semibold"
+                >
+                  Chamar no WhatsApp
+                </a>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-white/85">Próximo cliente</p>
+            <p className="mt-1 text-lg font-semibold">Nenhum horário marcado por enquanto.</p>
+            <p className="mt-1 text-sm text-white/85">
+              Divulgue o link da sua página para os clientes agendarem sozinhos.
+            </p>
+            {shop && (
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(`${window.location.origin}/barbearia/${shop.slug}`);
+                    toast.success("Link copiado.");
+                  } catch {
+                    toast.error("Não foi possível copiar o link.");
+                  }
+                }}
+                className="press mt-4 h-11 rounded-xl bg-white px-4 text-sm font-semibold text-[#12485a]"
+              >
+                Copiar link da minha página
+              </button>
+            )}
+          </>
+        )}
+      </section>
+
+      <section className="mt-3 grid grid-cols-2 gap-3">
         <Stat
-          label="Barbeiros ativos"
-          value={String((barbers ?? []).filter((b) => b.active).length)}
+          label="Atendimentos hoje"
+          value={String(todayActive.length)}
+          hint={`${todayDone.length} ${todayDone.length === 1 ? "concluído" : "concluídos"}`}
         />
+        <Stat
+          label="Previsto hoje"
+          value={money(todayExpected)}
+          hint={`${money(sumCents(todayDone))} já recebidos`}
+        />
+      </section>
+
+      <section className="mt-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[17px] font-semibold">Agenda de hoje</h2>
+          <Link to="/agenda" className="flex h-11 items-center text-sm font-semibold text-primary">
+            Ver agenda
+          </Link>
+        </div>
+        <div className="panel">
+          {todayActive.length === 0 ? (
+            <p className="px-4 py-8 text-center text-sm text-muted-foreground">Nenhum horário hoje.</p>
+          ) : (
+            <ul className="divide-y divide-border">
+              {todayActive.map((a) => (
+                <li key={a.id}>
+                  <button
+                    onClick={() => setSelected(a)}
+                    className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3.5 px-4 py-3 text-left transition-colors hover:bg-secondary/60"
+                  >
+                    <span
+                      className={cn(
+                        "display-num w-14 text-xl font-bold",
+                        a.status === "completed" && "text-muted-foreground",
+                      )}
+                    >
+                      {hhmm(a.starts_at)}
+                    </span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{a.customer_name ?? a.customers?.name}</span>
+                      <span className="block truncate text-[13px] text-muted-foreground">
+                        {a.services?.name} · {a.barbers?.name}
+                      </span>
+                    </span>
+                    <StatusBadge status={a.status} />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
 
       <section className="mt-6 panel p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold">Faturamento</h2>
+          <h2 className="text-[17px] font-semibold">Faturamento</h2>
           <div className="flex gap-2" role="group" aria-label="Período do faturamento">
             {(Object.keys(PERIOD_LABEL) as Period[]).map((key) => (
               <Button
@@ -174,21 +285,21 @@ function DashboardPage() {
         <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <div>
             <p className="label-caps">Realizado</p>
-            <p className="numeric mt-2 text-2xl font-semibold">{money(realized)}</p>
+            <p className="display-num mt-2 text-[28px] leading-none font-bold">{money(realized)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {done.length} {done.length === 1 ? "atendimento concluído" : "atendimentos concluídos"}
             </p>
           </div>
           <div>
             <p className="label-caps">Previsto</p>
-            <p className="numeric mt-2 text-2xl font-semibold">{money(expected)}</p>
+            <p className="display-num mt-2 text-[28px] leading-none font-bold">{money(expected)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               Realizado + {scheduled.length} ainda {scheduled.length === 1 ? "agendado" : "agendados"}
             </p>
           </div>
           <div>
             <p className="label-caps">Não realizado</p>
-            <p className="numeric mt-2 text-2xl font-semibold">{money(lostTotal)}</p>
+            <p className="display-num mt-2 text-[28px] leading-none font-bold">{money(lostTotal)}</p>
             <p className="mt-1 text-xs text-muted-foreground">
               {cancelled.length} {cancelled.length === 1 ? "cancelado" : "cancelados"} ·{" "}
               {noShow.length} {noShow.length === 1 ? "falta" : "faltas"}
@@ -198,12 +309,14 @@ function DashboardPage() {
           </div>
         </div>
 
-        <Link to="/barbeiros" className="mt-3 inline-block text-sm text-primary">
-          Ver resultado por barbeiro
-        </Link>
-        <Link to="/alteracoes" className="mt-3 ml-4 inline-block text-sm text-primary">
-          Ver cancelamentos e remarcações
-        </Link>
+        <div className="mt-2 flex flex-wrap gap-x-5">
+          <Link to="/barbeiros" className="flex h-11 items-center text-sm font-semibold text-primary">
+            Resultado por barbeiro
+          </Link>
+          <Link to="/alteracoes" className="flex h-11 items-center text-sm font-semibold text-primary">
+            Cancelamentos e remarcações
+          </Link>
+        </div>
 
         {lostItems.length > 0 && (
           <div className="mt-4 border-t border-border pt-3">
@@ -259,42 +372,6 @@ function DashboardPage() {
         )}
       </section>
 
-      <section className="mt-6 panel">
-        <header className="flex items-center justify-between border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold">Próximos horários</h2>
-          <Link to="/agendamentos" className="text-sm text-primary">
-            Ver todos
-          </Link>
-        </header>
-        {(upcoming ?? []).length === 0 ? (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">
-            Nenhum agendamento futuro.
-          </p>
-        ) : (
-          <ul className="divide-y divide-border">
-            {(upcoming ?? []).map((a) => (
-              <li key={a.id}>
-                <button
-                  onClick={() => setSelected(a)}
-                  className="grid w-full grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/60"
-                >
-                  <span className="numeric w-16 shrink-0 text-sm font-semibold">
-                    {hhmm(a.starts_at)}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="block truncate text-sm font-medium">{a.customer_name ?? a.customers?.name}</span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {shortDate(new Date(a.starts_at))} · {a.services?.name} · {a.barbers?.name}
-                    </span>
-                  </span>
-                  <StatusBadge status={a.status} />
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
       <section className="mt-6 grid gap-3 sm:grid-cols-2">
         <Link to="/barbeiros">
           <Button variant="outline" className="h-12 w-full justify-start">
@@ -327,11 +404,23 @@ function DashboardPage() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function whenLabel(iso: string) {
+  const start = new Date(iso);
+  const now = new Date();
+  const minutes = Math.round((start.getTime() - now.getTime()) / 60000);
+  if (minutes <= 0) return "agora";
+  if (minutes < 60) return `em ${minutes} min`;
+  if (start.toDateString() === now.toDateString()) return "hoje";
+  if (start.toDateString() === addDays(now, 1).toDateString()) return "amanhã";
+  return shortDate(start);
+}
+
+function Stat({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
     <div className="panel p-4">
-      <p className="label-caps">{label}</p>
-      <p className="numeric mt-2 text-2xl font-semibold">{value}</p>
+      <p className="text-[13px] text-muted-foreground">{label}</p>
+      <p className="display-num mt-1.5 text-[30px] leading-none font-bold whitespace-nowrap">{value}</p>
+      {hint && <p className="mt-2 text-[13px] text-muted-foreground">{hint}</p>}
     </div>
   );
 }

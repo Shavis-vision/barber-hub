@@ -10,6 +10,8 @@ import { fetchSlots, groupSlots, useAvailableSlots } from "@/lib/booking";
 import { addDays, fromDateKey, hhmm, longDate, maskPhone, money, shortDate, toDateKey, weekdayShort } from "@/lib/format";
 import { manageUrl } from "@/lib/manage";
 import { cn } from "@/lib/utils";
+import { ShopBanner } from "@/components/shop-header";
+import { ThemeToggleButton } from "@/components/theme-switch";
 
 export const Route = createFileRoute("/barbearia/$slug")({
   head: ({ params }) => ({
@@ -23,7 +25,17 @@ export const Route = createFileRoute("/barbearia/$slug")({
   component: PublicBooking,
 });
 
-type Shop = { id: string; name: string; slug: string; address: string | null };
+type Shop = {
+  id: string;
+  name: string;
+  slug: string;
+  address: string | null;
+  page_icon: string;
+  page_icon_color: string;
+  page_banner: string;
+  logo_url: string | null;
+  banner_url: string | null;
+};
 type Svc = { id: string; name: string; description: string | null; price_cents: number; duration_minutes: number };
 type Brb = { id: string; name: string };
 
@@ -33,7 +45,7 @@ function usePublicShop(slug: string) {
     queryFn: async () => {
       const { data: shop, error } = await supabase
         .from("barbershops")
-        .select("id, name, slug, address")
+        .select("id, name, slug, address, page_icon, page_icon_color, page_banner, logo_url, banner_url")
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
@@ -299,14 +311,14 @@ function PublicBooking() {
                   aria-pressed={active}
                   aria-label={longDate(d)}
                   className={cn(
-                    "flex h-[4.5rem] w-16 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-xl border text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    "press flex h-[4.5rem] w-16 shrink-0 snap-start flex-col items-center justify-center gap-0.5 rounded-xl border text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                     active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary",
                   )}
                 >
                   <span className={cn("text-[11px] uppercase tracking-wide", active ? "opacity-90" : "text-muted-foreground")}>
                     {i === 0 ? "Hoje" : weekdayShort(d.getDay())}
                   </span>
-                  <span className="numeric text-lg font-semibold leading-none">{shortDate(d).split("/")[0]}</span>
+                  <span className="display-num text-[22px] font-bold leading-none">{shortDate(d).split("/")[0]}</span>
                 </button>
               );
             })}
@@ -360,7 +372,7 @@ function PublicBooking() {
               {periods.map((p) => (
                 <div key={p.label}>
                   <p className="label-caps mb-2">{p.label}</p>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
+                  <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
                     {p.items.map((g) => {
                       const active = slot === g.slotAt;
                       return (
@@ -369,7 +381,7 @@ function PublicBooking() {
                           onClick={() => setSlot(g.slotAt)}
                           aria-pressed={active}
                           className={cn(
-                            "numeric h-12 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            "press display-num h-12 rounded-xl border text-[17px] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                             active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary",
                           )}
                         >
@@ -419,29 +431,29 @@ function initials(name: string) {
 function Shell({ shop, servicesCount, children }: { shop?: Shop; servicesCount?: number; children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-surface">
-      <header className="border-b border-border bg-background">
-        <div className="mx-auto max-w-xl px-4 py-6 sm:py-8">
-          {shop ? (
-            <div className="flex items-center gap-4">
-              <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-lg font-semibold text-primary-foreground">
-                {initials(shop.name)}
-              </span>
-              <div className="min-w-0">
-                <h1 className="truncate text-xl font-semibold tracking-tight sm:text-2xl">{shop.name}</h1>
-                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
-                  {shop.address && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="size-3.5 shrink-0" aria-hidden /><span className="truncate">{shop.address}</span></span>}
-                  {!!servicesCount && <span className="inline-flex items-center gap-1"><Scissors className="size-3.5" aria-hidden />{servicesCount} {servicesCount === 1 ? "serviço" : "serviços"}</span>}
-                </div>
+      <header className="mx-auto max-w-xl">
+        {shop ? (
+          <>
+            <ShopBanner look={shop} height={148} iconSize={80} ringClass="border-surface">
+              <ThemeToggleButton className="absolute top-[calc(0.75rem+env(safe-area-inset-top))] right-3 bg-black/30 text-white backdrop-blur-sm" />
+            </ShopBanner>
+            <div className="px-5 pt-3 pb-2">
+              <h1 className="text-[30px] leading-[1.05] font-bold">{shop.name}</h1>
+              <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                {shop.address && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="size-3.5 shrink-0" aria-hidden /><span className="truncate">{shop.address}</span></span>}
+                {!!servicesCount && <span className="inline-flex items-center gap-1"><Scissors className="size-3.5" aria-hidden />{servicesCount} {servicesCount === 1 ? "serviço" : "serviços"}</span>}
               </div>
             </div>
-          ) : (
-            <p className="text-lg font-semibold">Cortesy</p>
-          )}
-          {shop && <p className="mt-4 text-sm text-muted-foreground">Agende seu horário online em poucos passos.</p>}
-        </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-between px-5 py-5">
+            <p className="font-display text-lg font-bold [font-stretch:85%]">Cortesy</p>
+            <ThemeToggleButton className="border border-border bg-card" />
+          </div>
+        )}
       </header>
       <main className="mx-auto max-w-xl px-4 pb-16 pt-2">{children}</main>
-      <footer className="pb-8 text-center text-xs text-muted-foreground">Agendamento por Cortesy</footer>
+      <footer className="pb-[calc(2rem+env(safe-area-inset-bottom))] text-center text-xs text-muted-foreground">Agendamento por Cortesy</footer>
     </div>
   );
 }

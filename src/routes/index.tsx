@@ -79,8 +79,8 @@ function Landing() {
             },
             {
               icon: Wallet,
-              title: "Comissão sem planilha",
-              text: "Veja quanto cada barbeiro rendeu e quanto pagar a ele.",
+              title: "Faturamento na palma da mão",
+              text: "Quanto entrou, quanto falta receber e a comissão de cada barbeiro.",
             },
           ].map(({ icon: Icon, title, text }) => (
             <div key={title} className="bg-card p-6">

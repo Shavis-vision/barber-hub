@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Copy, Mail, QrCode, RefreshCw, Wallet } from "lucide-react";
+import { Clock, Copy, Mail, Palette, Wallet } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 
@@ -68,14 +68,14 @@ function Landing() {
         <section className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
           {[
             {
-              icon: QrCode,
-              title: "Agendamento mais fácil",
-              text: "Seu cliente marca pelo link ou QR code, sem baixar aplicativo.",
+              icon: Clock,
+              title: "Agendamento 24 horas",
+              text: "O cliente marca a qualquer hora, até com a barbearia fechada.",
             },
             {
-              icon: RefreshCw,
-              title: "Remarcação sem ligação",
-              text: "O cliente cancela ou troca o horário sozinho, até 2 horas antes.",
+              icon: Palette,
+              title: "Sua marca, sua página",
+              text: "Logo, banner e cores da sua barbearia na página de agendamento.",
             },
             {
               icon: Wallet,

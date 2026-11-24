@@ -23,6 +23,9 @@ export const Route = createFileRoute("/auth")({
       },
     ],
   }),
+  // /auth?cadastro=1 abre direto o cadastro de barbearia (botões da página inicial).
+  validateSearch: (search: Record<string, unknown>): { cadastro?: 1 } =>
+    search["cadastro"] === 1 || search["cadastro"] === "1" ? { cadastro: 1 } : {},
   component: AuthPage,
 });
 
@@ -32,11 +35,12 @@ type AccountType = "client" | "owner";
 function AuthPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [mode, setMode] = useState<Mode>("login");
+  const { cadastro } = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(cadastro ? "signup" : "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [shopName, setShopName] = useState("");
-  const [accountType, setAccountType] = useState<AccountType>("client");
+  const [accountType, setAccountType] = useState<AccountType>(cadastro ? "owner" : "client");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState<null | "confirm" | "reset">(null);
 

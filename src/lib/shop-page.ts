@@ -62,11 +62,15 @@ export function iconColor(id: string) {
   return (ICON_COLORS.find((c) => c.id === id) ?? ICON_COLORS[0]).hex;
 }
 
+// Palavras que não ajudam a reconhecer a barbearia nas iniciais.
+const GENERIC_WORDS = new Set(["barbearia", "barber", "barbershop", "barbeiro", "salão", "salao", "shop"]);
+
 export function initials(name: string) {
+  const words = name.split(/\s+/).filter((p) => p.length > 2 || /^[A-ZÀ-Ú]/.test(p));
+  const specific = words.filter((w) => !GENERIC_WORDS.has(w.toLowerCase()));
+  const pick = specific.length > 0 ? specific : words;
   return (
-    name
-      .split(/\s+/)
-      .filter((p) => p.length > 2 || /^[A-ZÀ-Ú]/.test(p))
+    pick
       .slice(0, 2)
       .map((p) => p[0]!.toUpperCase())
       .join("") || name.slice(0, 2).toUpperCase()

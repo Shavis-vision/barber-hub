@@ -15,6 +15,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { THEME_SCRIPT, useSystemThemeSync } from "@/lib/theme";
+import { registerServiceWorker } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { name: "theme-color", content: "#faf9f7" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Cortesy" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { title: "Cortesy — Agendamento para barbearias" },
       {
         name: "description",
@@ -92,6 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
       { rel: "icon", href: "/favicon.ico", sizes: "any" },
       { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -127,6 +133,9 @@ function RootComponent() {
   const router = useRouter();
   const userIdRef = useRef<string | null | undefined>(undefined);
   useSystemThemeSync();
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event, session) => {

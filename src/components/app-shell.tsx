@@ -21,6 +21,7 @@ import { useMyShop } from "@/lib/shop";
 import { useAccessProfile, type Role } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 import { ThemeSegmented } from "@/components/theme-switch";
+import { InstallAppBanner, InstallAppRow } from "@/components/install-app";
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 
 const NAV = [
@@ -108,6 +109,7 @@ export function AppShell({
 
         <div className="mt-4 border-t border-border pt-3">
           <ThemeSegmented className="px-1 pb-3" />
+          <InstallAppRow className="rounded-lg px-3 py-2 text-sm text-muted-foreground hover:bg-secondary hover:text-foreground [&_svg]:size-4" />
           {shop && (
             <a
               href={`/barbearia/${shop.slug}`}
@@ -143,6 +145,7 @@ export function AppShell({
         </header>
 
         <main className="mx-auto max-w-5xl px-4 pt-5 pb-[calc(7rem+env(safe-area-inset-bottom))] sm:px-6 lg:pb-12">
+          {(pathname === "/dashboard" || pathname === "/agenda") && <InstallAppBanner />}
           {children}
         </main>
       </div>
@@ -205,6 +208,9 @@ export function AppShell({
                 </Link>
               </li>
             ))}
+            <li>
+              <InstallAppRow className="h-13" />
+            </li>
             {shop && (
               <li>
                 <a

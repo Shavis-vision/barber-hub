@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sem conexão — Cortesy</title>
+<style>
+  :root { color-scheme: light dark; --bg: #faf9f7; --ink: #15191b; --muted: #5c6569; --primary: #165a6e; --on: #fff; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0e1315; --ink: #edf1f2; --muted: #9ca8ac; --primary: #7cc0d3; --on: #0b2630; } }
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center; background: var(--bg); color: var(--ink); font: 16px/1.5 system-ui, sans-serif; padding: 24px; box-sizing: border-box; text-align: center; }
+  img { width: 56px; height: 56px; border-radius: 15px; }
+  h1 { margin: 18px 0 6px; font-size: 24px; }
+  p { margin: 0; color: var(--muted); max-width: 320px; }
+  button { margin-top: 24px; height: 48px; padding: 0 24px; border: 0; border-radius: 12px; background: var(--primary); color: var(--on); font: 600 16px system-ui, sans-serif; cursor: pointer; }
+</style>
+</head>
+<body>
+  <main>
+    <img src="/icons/icon-192.png" alt="">
+    <h1>Sem conexão</h1>
+    <p>Verifique a internet do celular. Assim que voltar, a sua agenda aparece normalmente.</p>
+    <button type="button" onclick="location.reload()">Tentar de novo</button>
+  </main>
+</body>
+</html>

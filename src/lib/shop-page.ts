@@ -81,16 +81,16 @@ export function initials(name: string) {
  * Reduz a imagem no próprio navegador antes de enviar (economiza espaço e dados móveis).
  * Banner: até 1600 px de largura. Logo: quadrado de até 512 px.
  */
-export async function shrinkImage(file: File, kind: "logo" | "banner"): Promise<Blob> {
+export async function shrinkImage(file: File, kind: "logo" | "banner" | "product"): Promise<Blob> {
   if (!file.type.startsWith("image/")) throw new Error("Escolha um arquivo de imagem.");
   if (file.size > 15 * 1024 * 1024) throw new Error("Imagem muito grande (máximo 15 MB).");
   const bitmap = await createImageBitmap(file);
-  const max = kind === "logo" ? 512 : 1600;
+  const max = kind === "logo" ? 512 : kind === "product" ? 600 : 1600;
   let sx = 0;
   let sy = 0;
   let sw = bitmap.width;
   let sh = bitmap.height;
-  if (kind === "logo") {
+  if (kind === "logo" || kind === "product") {
     const side = Math.min(sw, sh);
     sx = (sw - side) / 2;
     sy = (sh - side) / 2;

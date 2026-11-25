@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { RoleGate } from "@/components/role-gate";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, TriangleAlert } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { NewAppointmentDialog, AppointmentDetailDialog } from "@/components/appointment-dialogs";
 import { StatusBadge } from "@/components/status-badge";
@@ -18,6 +18,7 @@ import {
 } from "@/lib/shop";
 import { addDays, hhmm, longDate, money, shortDate, startOfWeek } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { isLowStock, useProducts } from "@/lib/products";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -93,6 +94,8 @@ type LostItem =
 
 function DashboardPage() {
   const { data: shop } = useMyShop();
+  const { data: products } = useProducts(shop?.id);
+  const lowStock = (products ?? []).filter(isLowStock);
   const [creating, setCreating] = useState(false);
   const [selected, setSelected] = useState<AppointmentRow | null>(null);
   const [period, setPeriod] = useState<Period>("day");
@@ -209,6 +212,24 @@ function DashboardPage() {
           </>
         )}
       </section>
+
+      {lowStock.length > 0 && (
+        <Link
+          to="/estoque"
+          className="press mt-3 flex items-center gap-3 rounded-2xl border border-warning/50 bg-warning/10 px-4 py-3"
+        >
+          <TriangleAlert className="size-5 shrink-0 text-warning-foreground dark:text-warning" aria-hidden />
+          <span className="min-w-0 flex-1 text-[15px]">
+            <strong>
+              {lowStock.length} {lowStock.length === 1 ? "produto acabando" : "produtos acabando"}
+            </strong>
+            <span className="block truncate text-[13px] text-muted-foreground">
+              {lowStock.map((p) => p.name).join(", ")}
+            </span>
+          </span>
+          <span className="text-sm font-semibold text-primary">Ver</span>
+        </Link>
+      )}
 
       <section className="mt-3 grid grid-cols-2 gap-3">
         <Stat

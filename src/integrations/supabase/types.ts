@@ -501,6 +501,50 @@ export type Database = {
           },
         ]
       }
+      products: {
+        Row: {
+          barbershop_id: string
+          created_at: string
+          id: string
+          min_quantity: number
+          name: string
+          photo_url: string | null
+          price_cents: number
+          quantity: number
+          updated_at: string
+        }
+        Insert: {
+          barbershop_id: string
+          created_at?: string
+          id?: string
+          min_quantity?: number
+          name: string
+          photo_url?: string | null
+          price_cents?: number
+          quantity?: number
+          updated_at?: string
+        }
+        Update: {
+          barbershop_id?: string
+          created_at?: string
+          id?: string
+          min_quantity?: number
+          name?: string
+          photo_url?: string | null
+          price_cents?: number
+          quantity?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
